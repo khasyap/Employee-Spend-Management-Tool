@@ -1,0 +1,410 @@
+<div class="body-v">
+  <div class="container-fluid mt-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2><i class="fas fa-tachometer-alt me-2"></i>Finance Dashboard</h2>
+          <div class="d-flex align-items-center">
+            <div class="dropdown me-3">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span class="badge bg-danger" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li><a class="dropdown-item" routerLink="/finance/notifications">View All Notifications</a></li>
+              </ul>
+            </div>
+            <div class="d-flex align-items-center">
+              <span class="status-indicator" [class.status-online]="connectionStatus" [class.status-offline]="!connectionStatus"></span>
+              <span class="connection-status" [class.connected]="connectionStatus" [class.disconnected]="!connectionStatus">
+                {{ connectionStatus ? 'LIVE' : 'OFFLINE' }}
+              </span>
+              <small class="text-muted ms-2">Real-time updates</small>
+            </div>
+          </div>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2 text-muted">Loading dashboard data...</p>
+    </div>
+
+    <div *ngIf="!loading" class="row">
+      <!-- Statistics Cards -->
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Pending Claims</h6>
+                <h3 class="realtime-number">{{ formatNumber(getPendingClaims()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-clock fa-2x text-warning"></i>
+              </div>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar bg-warning" [style.width.%]="getPercentage(getPendingClaims(), getPendingClaims() + getApprovedClaims() + getRejectedClaims())"></div>
+            </div>
+            <small class="text-muted">Awaiting review</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Approved Claims</h6>
+                <h3 class="realtime-number">{{ formatNumber(getApprovedClaims()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-check-circle fa-2x text-success"></i>
+              </div>
+            </div>
+            <div class="mini-chart mt-2">
+              <div *ngFor="let bar of [40, 60, 35, 75, 50, 65, 45]" class="chart-bar" [style.height.px]="bar * 0.4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Rejected Claims</h6>
+                <h3 class="realtime-number">{{ formatNumber(getRejectedClaims()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-times-circle fa-2x text-danger"></i>
+              </div>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar bg-danger" [style.width.%]="getPercentage(getRejectedClaims(), getPendingClaims() + getApprovedClaims() + getRejectedClaims())"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Paid Claims</h6>
+                <h3 class="realtime-number">{{ formatNumber(getPaidClaims()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-dollar-sign fa-2x text-primary"></i>
+              </div>
+            </div>
+            <div class="sparkline">
+              <div *ngFor="let bar of [30, 45, 60, 35, 70, 55, 65]" class="sparkline-bar" [style.height.px]="bar * 0.3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW Direct to Finance -->
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Direct to Finance</h6>
+                <h3 class="realtime-number">{{ formatNumber(getDirectToFinanceClaims()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-forward fa-2x text-info"></i>
+              </div>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar bg-info" 
+                   [style.width.%]="getPercentage(getDirectToFinanceClaims(), getPendingClaims() + getApprovedClaims() + getRejectedClaims() + getDirectToFinanceClaims())">
+              </div>
+            </div>
+            <small class="text-muted">Bypassed manager approval</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW Escalated Claims -->
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Escalated Claims</h6>
+                <h3 class="realtime-number">{{ formatNumber(getEscalatedClaims()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+              </div>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar bg-warning" 
+                   [style.width.%]="getPercentage(getEscalatedClaims(), getPendingClaims() + getApprovedClaims() + getRejectedClaims() + getEscalatedClaims())">
+              </div>
+            </div>
+            <small class="text-muted">Requires admin attention</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPDATED Total Amount -->
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Total Amount</h6>
+                <h3 class="realtime-number">{{ formatCurrency(getTotalAmount()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-calculator fa-2x text-info"></i>
+              </div>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar bg-success" [style.width.%]="getPercentage(getPaidAmount(), getTotalAmount())"></div>
+              <div class="progress-bar bg-warning" [style.width.%]="getPercentage(getPendingAmount(), getTotalAmount())"></div>
+              <div class="progress-bar bg-info" [style.width.%]="getPercentage(getEscalatedAmount(), getTotalAmount())"></div>
+            </div>
+            <div class="mt-2">
+              <small class="text-muted d-block">Paid: {{ formatCurrency(getPaidAmount()) }}</small>
+              <small class="text-muted d-block">Pending: {{ formatCurrency(getPendingAmount()) }}</small>
+              <small class="text-muted d-block">Escalated: {{ formatCurrency(getEscalatedAmount()) }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-2 col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <h6 class="text-muted mb-1">Avg Payment</h6>
+                <h3 class="realtime-number">{{ formatCurrency(getAverageClaim()) }}</h3>
+              </div>
+              <div class="flex-shrink-0">
+                <i class="fas fa-receipt fa-2x text-secondary"></i>
+              </div>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar" [style.width.%]="getPercentage(getAverageClaim(), 1000)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Summary -->
+    <div class="col-lg-4 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Orders Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-4">
+              <h4 class="text-warning">{{ formatNumber(getPendingOrders()) }}</h4>
+              <small class="text-muted">Pending</small>
+            </div>
+           
+            <div class="col-4">
+              <h4 class="text-danger">{{ formatNumber(getRejectedOrders()) }}</h4>
+              <small class="text-muted">Rejected</small>
+            </div>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between">
+            <span>Total Amount:</span>
+            <strong>{{ formatCurrency(getTotalOrderAmount()) }}</strong>
+          </div>
+          <!-- <div class="d-flex justify-content-between">
+            <span>Monthly Amount:</span>
+            <strong>{{ formatCurrency(getMonthlyOrderAmount()) }}</strong>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Status -->
+    <div class="col-lg-8 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Budget Status by Category</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="getBudgetStatus().length === 0" class="text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>No budget data available
+          </div>
+          <div class="table-responsive" *ngIf="getBudgetStatus().length > 0">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Monthly Limit</th>
+                  <th>Used</th>
+                  <th>Remaining</th>
+                  <th>Usage %</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let budget of getBudgetStatus()">
+                  <td>{{ budget.categoryId?.name || 'Unknown' }}</td>
+                  <td>{{ formatCurrency(budget.amount || 0) }}</td>
+                  <td>{{ formatCurrency(getCategoryUsage(budget.categoryId?._id) || 0) }}</td>
+                  <td>{{ formatCurrency((budget.amount || 0) - (getCategoryUsage(budget.categoryId?._id) || 0)) }}</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" 
+                           [ngClass]="{
+                             'bg-success': (getCategoryUsage(budget.categoryId?._id) / budget.amount) < 0.75,
+                             'bg-warning': (getCategoryUsage(budget.categoryId?._id) / budget.amount) >= 0.75 && (getCategoryUsage(budget.categoryId?._id) / budget.amount) < 0.9,
+                             'bg-danger': (getCategoryUsage(budget.categoryId?._id) / budget.amount) >= 0.9
+                           }"
+                           [style.width.%]="getPercentage(getCategoryUsage(budget.categoryId?._id) || 0, budget.amount || 1)">
+                      </div>
+                    </div>
+                    <small>{{ getPercentage(getCategoryUsage(budget.categoryId?._id) || 0, budget.amount || 1) }}%</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Claims -->
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Recent Claims</h5>
+          <a routerLink="/finance/claims" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <div *ngIf="getRecentClaims().length === 0" class="text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>No recent claims
+          </div>
+          <div class="table-responsive" *ngIf="getRecentClaims().length > 0">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let claim of getRecentClaims()">
+                  <td>{{ claim.employeeId?.name || 'Unknown' }}</td>
+                  <td>{{ claim.category?.name || 'N/A' }}</td>
+                  <td>{{ formatCurrency(claim.amount || 0) }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(claim.status)">
+                      {{ claim.status || 'Unknown' | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ claim.submittedOn | date:'short' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Recent Orders</h5>
+          <a routerLink="/finance/orders" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <div *ngIf="getRecentOrders().length === 0" class="text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>No recent orders
+          </div>
+          <div class="table-responsive" *ngIf="getRecentOrders().length > 0">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Item</th>
+                  <th>Vendor</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of getRecentOrders()">
+                  <td>{{ order.employeeId?.name || 'Unknown' }}</td>
+                  <td>{{ order.item || 'N/A' }}</td>
+                  <td>{{ order.vendor || 'N/A' }}</td>
+                  <td>{{ formatCurrency(order.amount || 0) }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                      {{ order.status || 'Unknown' | titlecase }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-time Updates -->
+    <div class="col-12 mb-4">
+      <div class="card dashboard-card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Real-time Updates</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="realtimeUpdates.length === 0" class="text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>No recent updates
+          </div>
+          <div *ngFor="let update of realtimeUpdates" class="mb-3 p-3 border rounded">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="small text-muted">{{ update.timestamp | date:'medium' }}</div>
+                <span class="font-weight-bold text-primary">{{ update.event | titlecase }}</span>
+                <div *ngIf="update.data" class="small mt-1">
+                  <span *ngIf="update.data.amount">
+                    <strong>Amount:</strong> {{ formatCurrency(update.data.amount) }}
+                  </span>
+                  <span *ngIf="update.data.status" class="ms-2">
+                    <strong>Status:</strong> 
+                    <span class="badge" [ngClass]="getStatusBadgeClass(update.data.status)">
+                      {{ update.data.status | titlecase }}
+                    </span>
+                  </span>
+                  <span *ngIf="update.data.item" class="ms-2">
+                    <strong>Item:</strong> {{ update.data.item }}
+                  </span>
+                </div>
+              </div>
+              <i class="fas fa-sync-alt text-warning" *ngIf="update.event === 'claim.updated' || update.event === 'order.updated'"></i>
+              <i class="fas fa-check-circle text-primary" *ngIf="update.event === 'payment.paid'"></i>
+              <i class="fas fa-thumbs-up text-success" *ngIf="update.event === 'claim.approved' || update.event === 'order.approved'"></i>
+              <i class="fas fa-thumbs-down text-danger" *ngIf="update.event === 'claim.rejected' || update.event === 'order.rejected'"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

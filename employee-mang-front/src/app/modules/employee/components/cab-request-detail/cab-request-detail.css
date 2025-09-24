@@ -1,0 +1,102 @@
+/* Cab Driver Card Styles */
+.cab-driver-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cab-driver-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 15px;
+}
+
+.cab-driver-header i {
+  font-size: 24px;
+  margin-right: 12px;
+  color: #fff;
+}
+
+.cab-driver-header h6 {
+  margin: 0;
+  font-weight: 600;
+  color: #fff;
+}
+
+.driver-info-item {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-weight: 500;
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.info-label i {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.additional-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.info-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+}
+
+/* Call button style */
+.btn-outline-primary {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.btn-outline-primary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #fff;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .cab-driver-card {
+    padding: 15px;
+  }
+  
+  .additional-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .info-badge {
+    width: 100%;
+  }
+}

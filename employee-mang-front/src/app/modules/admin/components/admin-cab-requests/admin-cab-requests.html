@@ -1,0 +1,87 @@
+<div class="card">
+  <div class="card-header">
+    <h3>Daily Cab Requests Approval</h3>
+    <div class="filter-section">
+      <label for="statusFilter">Filter by Status:</label>
+      <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()" class="form-select">
+        <option value="">All</option>
+        <option value="approved_by_manager">Approved by Manager</option>
+        <option value="approved_by_admin">Approved by Admin</option>
+        <option value="rejected_by_admin">Rejected by Admin</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!isLoading && !error && cabRequests.length === 0" class="empty-state">
+      <i class="fas fa-taxi"></i>
+      <h4>No Cab Requests Found</h4>
+      <p>There are no daily cab requests requiring admin approval.</p>
+    </div>
+
+    <div *ngIf="!isLoading && cabRequests.length > 0" class="requests-list">
+      <div *ngFor="let request of cabRequests" class="request-card">
+        <div class="request-header">
+          <h5>Daily Service - {{ getEmployeeName(request.employeeId) }}</h5>
+          <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+            {{ normalizeStatus(request.status) | titlecase }}
+          </span>
+        </div>
+
+        <div class="request-details">
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Employee:</strong> {{ getEmployeeName(request.employeeId) }}
+            </div>
+            <div class="detail-item">
+              <strong>Department:</strong> {{ getEmployeeDepartment(request.employeeId) }}
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Pickup:</strong> {{ request.pickupLocation }}
+            </div>
+            <div class="detail-item">
+              <strong>Drop:</strong> {{ request.dropLocation }}
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Shift:</strong> {{ request.shift | titlecase }}
+            </div>
+            <div class="detail-item">
+              <strong>Start Date:</strong> {{ request.pickupTime | date:'mediumDate' }}
+            </div>
+          </div>
+
+          <div *ngIf="request.description" class="detail-item">
+            <strong>Description:</strong> {{ request.description }}
+          </div>
+
+          <div class="detail-item">
+            <strong>Manager:</strong> {{ getManagerName(request.managerId) }}
+          </div>
+        </div>
+
+        <div class="request-actions" *ngIf="request.status === 'approved_by_manager'">
+          <button (click)="approveRequest(request)" class="btn btn-sm btn-success">
+            Approve
+          </button>
+          <button (click)="rejectRequest(request)" class="btn btn-sm btn-danger">
+            Reject
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

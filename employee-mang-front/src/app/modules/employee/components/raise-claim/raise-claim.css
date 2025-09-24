@@ -1,0 +1,122 @@
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  min-height: 100vh;
+  padding-bottom: 30px;
+}
+h2 {
+  font-weight: 700;
+  color: #0056b3;
+}
+
+hr {
+  border-top: 3px solid #ff7f32;
+  width: 80px;
+  margin-top: 0.5rem;
+}
+.card {
+  border-radius: 15px;
+  border: none;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff !important;
+  border-radius: 15px 15px 0 0;
+  font-weight: 600;
+}
+.alert {
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  border: none;
+}
+
+.alert-success {
+  background: #e8f7ef;
+  color: #2e7d32;
+}
+
+.alert-danger {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.alert-info {
+  background: #e8f4fd;
+  color: #0056b3;
+}
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.2);
+}
+
+.invalid-feedback {
+  font-size: 0.85rem;
+  color: #c62828;
+}
+
+.input-group-text {
+  background: #f1f5f9;
+  border: 1px solid #dee2e6;
+  border-radius: 8px 0 0 8px;
+  font-weight: 600;
+}
+.badge.bg-success {
+  font-size: 0.85rem;
+  padding: 0.5em 0.8em;
+  border-radius: 8px;
+  background: #28a745 !important;
+}
+.btn {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #004494, #e56720);
+}
+
+.btn-outline-secondary {
+  border: 1px solid #6c757d;
+  color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+  background: #6c757d;
+  color: #fff;
+}
+
+.btn-success {
+  background: #28a745;
+  border: none;
+}
+
+.btn-success:hover {
+  background: #218838;
+}
+.card-body ul li {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.card-body ul li strong {
+  color: #0056b3;
+}

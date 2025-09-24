@@ -1,0 +1,373 @@
+<!-- validate-claims.html - Final Merged -->
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Validate Claims & Orders</h2>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'claims'" (click)="switchTab('claims')">
+        Claims
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
+        Orders
+      </a>
+    </li>
+  </ul>
+
+  <!-- Claims Filter Section -->
+  <div class="card shadow mb-4" *ngIf="activeTab === 'claims'">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="statusFilter">Filter by Status</label>
+            <select 
+              class="form-control" 
+              id="statusFilter"
+              [(ngModel)]="statusFilter"
+              (change)="onStatusFilterChange()">
+              <option value="sent_to_finance">Pending Validation</option>
+              <option value="approved_by_finance">Approved</option>
+              <option value="rejected_by_finance">Rejected</option>
+              <option value="paid">Paid</option>
+              <option value="all">All Statuses</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Filter Section -->
+  <div class="card shadow mb-4" *ngIf="activeTab === 'orders'">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="orderStatusFilter">Filter by Status</label>
+            <select 
+              class="form-control" 
+              id="orderStatusFilter"
+              [(ngModel)]="orderStatusFilter"
+              (change)="onOrderStatusFilterChange()">
+              <option value="approved_by_manager">Approved by Manager</option>
+              <option value="approved_by_finance">Approved by Finance</option>
+              <option value="processing">Processing</option>
+              <option value="fulfilled">Fulfilled</option>
+              <option value="rejected_by_finance">Rejected</option>
+              <option value="all">All Statuses</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border spinner-border-sm text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="!loading">
+    <!-- Claims List -->
+    <div class="col-lg-6" *ngIf="activeTab === 'claims'">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Claims List</h6>
+        </div>
+        <div class="card-body">
+          <div *ngIf="filteredClaims.length === 0" class="alert alert-info">
+            No claims found with the selected filter.
+          </div>
+
+          <div *ngIf="filteredClaims.length > 0" class="list-group">
+            <a 
+              *ngFor="let claim of filteredClaims"
+              href="javascript:void(0)" 
+              class="list-group-item list-group-item-action"
+              [class.active]="selectedClaim?._id === claim._id"
+              (click)="selectClaim(claim)">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">{{ getEmployeeName(claim) }}</h6>  
+                <small>{{ claim.amount | currency:'USD' }}</small>
+              </div>
+              <p class="mb-1">{{ claim.description }}</p>
+              <small>
+                <span class="badge" [ngClass]="getStatusBadgeClass(claim.status)">
+                  {{ claim.status | titlecase }}
+                </span>
+                • {{ claim.submittedOn | date:'short' }}
+              </small>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders List -->
+    <div class="col-lg-6" *ngIf="activeTab === 'orders'">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Orders List</h6>
+        </div>
+        <div class="card-body">
+          <div *ngIf="filteredOrders.length === 0" class="alert alert-info">
+            No orders found with the selected filter.
+          </div>
+
+          <div *ngIf="filteredOrders.length > 0" class="list-group">
+            <a 
+              *ngFor="let order of filteredOrders"
+              href="javascript:void(0)" 
+              class="list-group-item list-group-item-action"
+              [class.active]="selectedOrder?._id === order._id"
+              (click)="selectOrder(order)">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">{{ getEmployeeName(order) }}</h6>  
+                <small>{{ order.amount | currency:'USD' }}</small>
+              </div>
+              <p class="mb-1">{{ order.item }} - {{ order.vendor }}</p>
+              <small>
+                <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                  {{ order.status | titlecase }}
+                </span>
+                • {{ order.createdAt | date:'short' }}
+              </small>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Panel -->
+    <div class="col-lg-6">
+      <!-- Claim Details -->
+      <div class="card shadow" *ngIf="selectedClaim && activeTab === 'claims'">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Claim Validation</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <strong>Employee:</strong> {{ getEmployeeName(selectedClaim) }}<br>
+            <strong>Manager:</strong> {{ getManagerName(selectedClaim) }}<br>
+            <strong>Category:</strong> {{ getCategoryName(selectedClaim) }}<br>
+            <strong>Amount:</strong> {{ selectedClaim.amount | currency:'USD' }}<br>
+            <strong>Description:</strong> {{ selectedClaim.description }}<br>
+            <strong>Status:</strong> 
+            <span class="badge" [ngClass]="getStatusBadgeClass(selectedClaim.status)">
+              {{ selectedClaim.status | titlecase }}
+            </span><br>
+            <strong>Submitted:</strong> {{ selectedClaim.submittedOn | date:'medium' }}<br>
+          </div>
+
+          <div *ngIf="selectedClaim.billUrl" class="mb-3">
+            <strong>Bill Attachment:</strong>
+            <a [href]="selectedClaim.billUrl" target="_blank" class="btn btn-sm btn-info ms-2">
+              View Bill
+            </a>
+          </div>
+
+          <!-- Budget Information -->
+          <div *ngIf="selectedClaim" class="mb-3">
+            <h6>Budget Information:</h6>
+            <div *ngIf="budgetLoading" class="text-center">
+              <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <div *ngIf="!budgetLoading && budgetInfo" class="budget-card p-3 border rounded">
+              <div class="row">
+                <div class="col-md-6">
+                  <strong>Category:</strong> {{ budgetInfo.category }}<br>
+                  <strong>Monthly Limit:</strong> {{ budgetInfo.monthlyLimit | currency:'USD' }}<br>
+                  <strong>Current Usage:</strong> {{ budgetInfo.currentUsage | currency:'USD' }}<br>
+                </div>
+                <div class="col-md-6">
+                  <strong>Remaining Budget:</strong> 
+                  <span [ngClass]="{'text-danger': budgetInfo.remainingBudget < selectedClaim.amount}">
+                    {{ budgetInfo.remainingBudget | currency:'USD' }}
+                  </span><br>
+                  <strong>Utilization:</strong> {{ budgetInfo.utilizationPercentage }}%<br>
+                  <strong>Claim Amount:</strong> {{ selectedClaim.amount | currency:'USD' }}
+                </div>
+              </div>
+              <div class="progress mt-2" *ngIf="budgetInfo">
+                <div class="progress-bar" 
+                    [ngClass]="{
+                      'bg-success': budgetInfo.utilizationPercentage < 75,
+                      'bg-warning': budgetInfo.utilizationPercentage >= 75 && budgetInfo.utilizationPercentage < 90,
+                      'bg-danger': budgetInfo.utilizationPercentage >= 90
+                    }"
+                    [style.width]="budgetInfo.utilizationPercentage + '%'">
+                  {{ budgetInfo.utilizationPercentage }}%
+                </div>
+              </div>
+              <div *ngIf="budgetInfo.remainingBudget < selectedClaim.amount" class="alert alert-warning mt-2">
+                <i class="fas fa-exclamation-triangle"></i> 
+                This claim exceeds the remaining budget. It will be escalated to admin for approval.
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div *ngIf="showActionButtons(selectedClaim)" class="mb-3">
+            <h6>Take Action:</h6>
+            <textarea 
+              class="form-control mb-2" 
+              placeholder="Enter comments (required for rejection)"
+              [(ngModel)]="actionComment"
+              rows="3"></textarea>
+            
+            <div class="btn-group">
+              <button 
+                class="btn btn-success"
+                (click)="approveClaim()">
+                Approve
+              </button>
+              <button 
+                class="btn btn-danger"
+                (click)="rejectClaim()"
+                [disabled]="!actionComment">
+                Reject
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="selectedClaim.status === 'approved_by_finance'" class="mb-3">
+            <h6>Payment Action:</h6>
+            <button 
+              class="btn btn-primary"
+              (click)="markAsPaid()">
+              Mark as Paid
+            </button>
+          </div>
+
+          <!-- Claim History -->
+          <div class="mt-3">
+            <h6>Claim History:</h6>
+            <div class="timeline">
+              <div *ngFor="let history of selectedClaim.history" class="timeline-item">
+                <div class="timeline-content">
+                  <strong>{{ history.byRole | titlecase }}:</strong> {{ history.action }}<br>
+                  <small class="text-muted">{{ history.at | date:'medium' }}</small>
+                  <div *ngIf="history.comment" class="mt-1">
+                    <em>"{{ history.comment }}"</em>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Details -->
+      <div class="card shadow" *ngIf="selectedOrder && activeTab === 'orders'">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Order Validation</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <strong>Employee:</strong> {{ getEmployeeName(selectedOrder) }}<br>
+            <strong>Manager:</strong> {{ getManagerName(selectedOrder) }}<br>
+            <strong>Item:</strong> {{ selectedOrder.item }}<br>
+            <strong>Vendor:</strong> {{ selectedOrder.vendor }}<br>
+            <strong>Amount:</strong> {{ selectedOrder.amount | currency:'USD' }}<br>
+            <strong>Description:</strong> {{ selectedOrder.description || 'N/A' }}<br>
+            <strong>Status:</strong> 
+            <span class="badge" [ngClass]="getStatusBadgeClass(selectedOrder.status)">
+              {{ selectedOrder.status | titlecase }}
+            </span><br>
+            <strong>Submitted:</strong> {{ selectedOrder.createdAt | date:'medium' }}<br>
+          </div>
+
+          <!-- Order Actions -->
+          <div *ngIf="selectedOrder.status === 'approved_by_manager'" class="mb-3">
+            <h6>Take Action:</h6>
+            <textarea 
+              class="form-control mb-2" 
+              placeholder="Enter comments (required for rejection)"
+              [(ngModel)]="actionComment"
+              rows="3"></textarea>
+            
+            <div class="btn-group">
+              <button 
+                class="btn btn-success"
+                (click)="approveOrder()">
+                Approve Order
+              </button>
+              <button 
+                class="btn btn-danger"
+                (click)="rejectOrder()"
+                [disabled]="!actionComment">
+                Reject
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="selectedOrder.status === 'approved_by_finance'" class="mb-3">
+            <h6>Process Order:</h6>
+            <textarea 
+              class="form-control mb-2" 
+              placeholder="Enter processing comments"
+              [(ngModel)]="actionComment"
+              rows="3"></textarea>
+            
+            <button 
+              class="btn btn-info"
+              (click)="processOrder()">
+              Start Processing
+            </button>
+          </div>
+
+          <div *ngIf="selectedOrder.status === 'processing'" class="mb-3">
+            <h6>Complete Order:</h6>
+            <textarea 
+              class="form-control mb-2" 
+              placeholder="Enter fulfillment comments"
+              [(ngModel)]="actionComment"
+              rows="3"></textarea>
+            
+            <button 
+              class="btn btn-primary"
+              (click)="fulfillOrder()">
+              Mark as Fulfilled
+            </button>
+          </div>
+
+          <!-- Order History -->
+          <div class="mt-3">
+            <h6>Order History:</h6>
+            <div class="timeline">
+              <div *ngFor="let history of selectedOrder.history" class="timeline-item">
+                <div class="timeline-content">
+                  <strong>{{ history.byRole | titlecase }}:</strong> {{ history.action }}<br>
+                  <small class="text-muted">{{ history.at | date:'medium' }}</small>
+                  <div *ngIf="history.comment" class="mt-1">
+                    <em>"{{ history.comment }}"</em>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty Panel -->
+      <div class="card shadow" *ngIf="!selectedClaim && !selectedOrder">
+        <div class="card-body text-center text-muted">
+          <i class="fas fa-info-circle fa-3x mb-3"></i>
+          <p>Select a {{ activeTab === 'claims' ? 'claim' : 'order' }} from the list to view details and take action.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

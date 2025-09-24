@@ -1,0 +1,206 @@
+<div class="body-v">
+  <!-- set-limits.html - Enhanced component with category dropdown -->
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="page-title">Set Limits & Budgets</h2>
+      <p class="page-subtitle">Configure spending limits and budgets for expense claims</p>
+      <hr class="title-divider">
+    </div>
+  </div>
+
+  <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
+    <div *ngIf="successMessage" class="alert custom-alert" 
+         [class.alert-success]="!successMessage.includes('Error')" 
+         [class.alert-danger]="successMessage.includes('Error')">
+      <i class="fas" [class.fa-check-circle]="!successMessage.includes('Error')" 
+         [class.fa-exclamation-circle]="successMessage.includes('Error')"></i>
+      {{ successMessage }}
+    </div>
+
+ <!-- Per Claim Limits -->
+<div class="card shadow mb-4 custom-card">
+  <div class="card-header py-3 card-header-blue">
+    <h6 class="m-0 font-weight-bold">
+      <i class="fas fa-chart-line me-2"></i>Per Claim Limits by Role
+    </h6>
+  </div>
+  <div class="card-body">
+    <div class="row" formGroupName="perClaimLimitByRole">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="employeeLimit" class="form-label">Employee Limit (USD)</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-user"></i></span>
+            <input 
+              type="number" 
+              class="form-control custom-input" 
+              id="employeeLimit"
+              formControlName="employee"
+              [class.is-invalid]="submitted && settingsForm.get('perClaimLimitByRole.employee')?.errors">
+          </div>
+          <div *ngIf="submitted && settingsForm.get('perClaimLimitByRole.employee')?.errors" class="invalid-feedback d-block">
+            <div *ngIf="settingsForm.get('perClaimLimitByRole.employee')?.errors?.['required']">Employee limit is required</div>
+            <div *ngIf="settingsForm.get('perClaimLimitByRole.employee')?.errors?.['min']">Limit must be positive</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="managerLimit" class="form-label">Manager Limit (USD)</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+            <input 
+              type="number" 
+              class="form-control custom-input" 
+              id="managerLimit"
+              formControlName="manager"
+              [class.is-invalid]="submitted && settingsForm.get('perClaimLimitByRole.manager')?.errors">
+          </div>
+          <div *ngIf="submitted && settingsForm.get('perClaimLimitByRole.manager')?.errors" class="invalid-feedback d-block">
+            <div *ngIf="settingsForm.get('perClaimLimitByRole.manager')?.errors?.['required']">Manager limit is required</div>
+            <div *ngIf="settingsForm.get('perClaimLimitByRole.manager')?.errors?.['min']">Limit must be positive</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="financeLimit" class="form-label">Finance Limit (USD)</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-chart-pie"></i></span>
+            <input 
+              type="number" 
+              class="form-control custom-input" 
+              id="financeLimit"
+              formControlName="finance"
+              [class.is-invalid]="submitted && settingsForm.get('perClaimLimitByRole.finance')?.errors">
+          </div>
+          <div *ngIf="submitted && settingsForm.get('perClaimLimitByRole.finance')?.errors" class="invalid-feedback d-block">
+            <div *ngIf="settingsForm.get('perClaimLimitByRole.finance')?.errors?.['required']">Finance limit is required</div>
+            <div *ngIf="settingsForm.get('perClaimLimitByRole.finance')?.errors?.['min']">Limit must be positive</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Monthly Limits by Category -->
+    <div class="card shadow mb-4 custom-card">
+      <div class="card-header py-3 card-header-blue d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold">
+          <i class="fas fa-calendar-alt me-2"></i>Monthly Limits by Category
+        </h6>
+        <button type="button" class="btn btn-sm btn-outline-light" (click)="addNewCategoryLimit()">
+          <i class="fas fa-plus me-1"></i> Add Category
+        </button>
+      </div>
+      <div class="card-body">
+        <div formArrayName="monthlyLimitByCategory">
+          <!-- Empty state message -->
+          <div *ngIf="monthlyLimits.controls.length === 0" class="text-center py-4 empty-state">
+            <i class="fas fa-folder-open fa-3x mb-3 text-muted"></i>
+            <p class="text-muted">No category limits configured. Click "Add Category" to get started.</p>
+          </div>
+          
+          <div *ngFor="let limit of monthlyLimits.controls; let i = index" [formGroupName]="i" class="card mb-4 category-card">
+            <div class="card-header category-card-header d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-0"><i class="fas fa-folder me-2"></i>Category Limit</h6>
+              </div>
+              <button type="button" class="btn btn-sm btn-danger" (click)="removeCategoryLimit(i)">
+                <i class="fas fa-times"></i> Remove
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Category</label>
+                  <select class="form-select custom-select" formControlName="categoryId" (change)="onCategoryChange(i)">
+                    <option value="">Select Category</option>
+                    <option *ngFor="let category of categories" [value]="category._id" 
+                            [disabled]="isCategoryAlreadySelected(category._id, i)">
+                      {{ category.name }}
+                    </option>
+                  </select>
+                  <div *ngIf="submitted && limit.get('categoryId')?.errors" class="invalid-feedback d-block">
+                    <div *ngIf="limit.get('categoryId')?.errors?.['required']">Category is required</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Category Limit (USD)</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                    <input 
+                      type="number" 
+                      class="form-control custom-input"
+                      formControlName="amount"
+                      [class.is-invalid]="submitted && limit.get('amount')?.errors">
+                  </div>
+                  <div *ngIf="submitted && limit.get('amount')?.errors" class="invalid-feedback d-block">
+                    <div *ngIf="limit.get('amount')?.errors?.['required']">Amount is required</div>
+                    <div *ngIf="limit.get('amount')?.errors?.['min']">Amount must be positive</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Employee Limits -->
+              <h6 class="mb-3 section-subtitle">
+                <i class="fas fa-users me-2"></i>Employee Specific Limits
+                <small class="text-muted ms-2">(Optional)</small>
+              </h6>
+              
+              <div formArrayName="employeeLimits">
+                <div *ngFor="let empLimit of employeeLimits(i).controls; let j = index" [formGroupName]="j" class="row mb-3 align-items-end employee-limit-row">
+                  <div class="col-md-5">
+                    <label class="form-label">Employee</label>
+                    <select class="form-select custom-select" formControlName="employeeId">
+                      <option value="">Select Employee</option>
+                      <option *ngFor="let employee of employees" [value]="employee._id">
+                        {{ employee.name }} ({{ employee.email }})
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label">Limit (USD)</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                      <input 
+                        type="number" 
+                        class="form-control custom-input"
+                        formControlName="amount">
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <button type="button" class="btn btn-danger btn-remove" (click)="removeEmployeeLimit(i, j)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <button type="button" class="btn btn-outline-primary mt-2 btn-add" (click)="addEmployeeLimit(i)">
+                <i class="fas fa-plus me-1"></i> Add Employee Limit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button 
+        type="submit" 
+        class="btn btn-primary btn-save"
+        [disabled]="loading">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+        <i class="fas fa-save me-2"></i>Save Limits
+      </button>
+      
+      <button type="button" class="btn btn-outline-secondary" (click)="cancelChanges()">
+        <i class="fas fa-times me-2"></i>Cancel
+      </button>
+    </div>
+  </form>
+</div>
+</div>

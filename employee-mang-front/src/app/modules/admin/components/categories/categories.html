@@ -1,0 +1,123 @@
+<div class="body-v">
+  <div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Manage Categories</h2>
+      <hr>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-5">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">
+            {{ editingCategory ? 'Edit Category' : 'Add New Category' }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+
+            <div class="form-group">
+              <label for="name">Category Name</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="name"
+                formControlName="name"
+                [class.is-invalid]="submitted && f['name'].errors">
+              <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
+                <div *ngIf="f['name'].errors['required']">Name is required</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="code">Category Code (3 letters)</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="code"
+                formControlName="code"
+                maxlength="3"
+                [class.is-invalid]="submitted && f['code'].errors">
+              <div *ngIf="submitted && f['code'].errors" class="invalid-feedback">
+                <div *ngIf="f['code'].errors['required']">Code is required</div>
+                <div *ngIf="f['code'].errors['maxlength']">Code must be 3 characters maximum</div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ editingCategory ? 'Update' : 'Create' }} Category
+              </button>
+              
+              <button 
+                *ngIf="editingCategory"
+                type="button" 
+                class="btn btn-secondary"
+                (click)="cancelEdit()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Existing Categories</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Code</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let category of categories">
+                  <td>{{ category.name }}</td>
+                  <td>{{ category.code }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="category.isActive ? 'bg-success' : 'bg-danger'">
+                      {{ category.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <button 
+                        class="btn btn-primary"
+                        (click)="editCategory(category)">
+                        <i class="fas fa-edit"></i> Edit
+                      </button>
+                      <button 
+                        class="btn"
+                        [ngClass]="category.isActive ? 'btn-warning' : 'btn-success'"
+                        (click)="toggleCategoryStatus(category)">
+                        {{ category.isActive ? 'Deactivate' : 'Activate' }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

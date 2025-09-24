@@ -1,0 +1,191 @@
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  min-height: 100vh;
+  padding-bottom: 30px;
+}
+/* ==== Dashboard Container ==== */
+.container-fluid {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* ==== Headings & Divider ==== */
+h2 {
+  font-weight: 700;
+  color: #0056b3;
+}
+
+hr {
+  border-top: 2px solid #ff7f32;
+  opacity: 0.4;
+}
+
+/* ==== Status Indicator ==== */
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.status-online {
+  background-color: #28a745;
+  box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+}
+
+.status-offline {
+  background-color: #dc3545;
+  box-shadow: 0 0 6px rgba(220, 53, 69, 0.6);
+}
+
+.connection-status {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.connection-status.connected {
+  color: #28a745;
+}
+
+.connection-status.disconnected {
+  color: #dc3545;
+}
+
+/* ==== Dashboard Cards ==== */
+.dashboard-card {
+  border: none;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.dashboard-card .card-header {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 16px 16px 0 0;
+  padding: 10px 15px;
+}
+
+/* ==== Realtime numbers ==== */
+.realtime-number {
+  font-weight: 700;
+  color: #0056b3;
+  font-size: 1.5rem;
+}
+
+/* ==== Sparklines and Charts ==== */
+.sparkline, .mini-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  margin-top: 10px;
+}
+
+.sparkline-bar, .chart-bar {
+  width: 6px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0056b3, #ff7f32);
+}
+
+.chart-bar {
+  width: 8px;
+}
+
+/* ==== Progress Bars ==== */
+.progress-container {
+  width: 100%;
+  height: 12px;
+  background: #f1f5fb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  transition: width 0.4s ease;
+}
+
+/* ==== Table Styling ==== */
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  background: #f7f9fc;
+  font-weight: 600;
+  color: #444;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* ==== Badges ==== */
+.badge {
+  padding: 0.4em 0.7em;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-success { background-color: #28a745; }
+.badge-warning { background-color: #ffc107; color: #000; }
+.badge-danger  { background-color: #dc3545; }
+.badge-info    { background-color: #17a2b8; }
+.badge-primary { background: linear-gradient(90deg, #0056b3, #ff7f32); }
+
+/* ==== Buttons ==== */
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 6px 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary {
+  border: 2px solid #0056b3;
+  color: #0056b3;
+}
+
+.btn-outline-primary:hover {
+  background: linear-gradient(90deg, #0056b3, #4d9fff);
+  color: #fff;
+}
+
+.btn-success {
+  background: linear-gradient(90deg, #28a745, #6ddc91);
+  border: none;
+}
+
+.btn-danger {
+  background: linear-gradient(90deg, #dc3545, #f58b96);
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #0056b3, #4d9fff);
+  border: none;
+}
+
+.btn-info {
+  background: linear-gradient(90deg, #17a2b8, #6edbe5);
+  border: none;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}

@@ -1,0 +1,94 @@
+<div class="container-fluid">
+
+  <!-- Header / Actions -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="m-0">Notifications</h5>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm"
+              (click)="toggleFilter()"
+              [disabled]="loading">
+        <i class="fas fa-filter me-1"></i>
+        {{ showUnreadOnly ? 'Show All' : 'Show Unread Only' }}
+      </button>
+
+      <button class="btn btn-outline-secondary btn-sm"
+              (click)="loadNotifications()"
+              [disabled]="loading">
+        <i class="fas fa-rotate-right me-1"></i>
+        Refresh
+      </button>
+
+      <!-- <button class="btn btn-success btn-sm"
+              (click)="markAllAsRead()"
+              [disabled]="loading || !hasUnreadNotifications()">
+        <i class="fas fa-check-double me-1"></i>
+        Mark all as read
+      </button> -->
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border" role="status" aria-label="Loading notifications"></div>
+    <div class="mt-2 text-muted">Loading notifications…</div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && notifications?.length === 0" class="alert alert-light border d-flex align-items-center" role="alert">
+    <i class="far fa-bell-slash fs-4 me-2"></i>
+    <div class="flex-grow-1">
+      <strong>No notifications</strong>
+      <div class="small text-muted">
+        {{ showUnreadOnly ? 'You are all caught up. No unread notifications.' : 'There are no notifications to show.' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications list -->
+  <ul *ngIf="!loading && notifications?.length"
+      class="list-group">
+
+    <li *ngFor="let n of notifications"
+        class="list-group-item d-flex align-items-start"
+        [class.opacity-75]="n.read">
+
+      <!-- Type badge -->
+      <span class="badge me-3 mt-1" [ngClass]="getBadgeClass(n.type)">
+        {{ (n.type || 'info') | titlecase }}
+      </span>
+
+      <!-- Content -->
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center justify-content-between">
+          <h6 class="mb-1">
+            {{ n.title || 'Notification' }}
+            <i *ngIf="!n.read" class="fas fa-circle text-primary ms-2" style="font-size: .5rem;" aria-label="Unread"></i>
+          </h6>
+          <small class="text-muted ms-3"
+                 [attr.title]="n.createdAt | date:'medium'">
+            {{ n.createdAt | date:'short' }}
+          </small>
+        </div>
+
+        <p class="mb-2" [innerText]="n.message || ''"></p>
+
+        <!-- Optional link if present -->
+        <!-- <a *ngIf="n.link" class="small" [href]="n.link" target="_blank" rel="noopener">
+          Open details <i class="fas fa-external-link-alt ms-1"></i>
+        </a>
+      </div> -->
+
+      <!-- Actions -->
+      <div class="ms-3 d-flex flex-column gap-2">
+        <button *ngIf="!n.read"
+                class="btn btn-outline-success btn-sm"
+                (click)="markAsRead(n)">
+          <i class="fas fa-check me-1"></i>
+          Mark as read
+        </button>
+      </div>
+    
+  
+
+</div>

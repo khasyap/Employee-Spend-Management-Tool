@@ -1,0 +1,187 @@
+<div class="body-v">
+  <div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Manage Users</h2>
+      <hr>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Create New User</h6>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+            <div *ngIf="successMessage" class="alert" 
+                 [class.alert-success]="!successMessage.includes('Error')"
+                 [class.alert-danger]="successMessage.includes('Error')">
+              {{ successMessage }}
+            </div>
+
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="name"
+                formControlName="name"
+                [class.is-invalid]="submitted && f['name'].errors">
+              <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
+                <div *ngIf="f['name'].errors['required']">Name is required</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email"
+                formControlName="email"
+                [class.is-invalid]="submitted && f['email'].errors">
+              <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+                <div *ngIf="f['email'].errors['required']">Email is required</div>
+                <div *ngIf="f['email'].errors['email']">Email must be valid</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password"
+                formControlName="password"
+                [class.is-invalid]="submitted && f['password'].errors">
+              <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+                <div *ngIf="f['password'].errors['required']">Password is required</div>
+                <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="role">Role</label>
+              <select 
+                class="form-control" 
+                id="role"
+                formControlName="role"
+                [class.is-invalid]="submitted && f['role'].errors">
+                <option value="employee">Employee</option>
+                <option value="manager">Manager</option>
+                <option value="finance">Finance</option>
+                <option value="admin">Admin</option>
+              </select>
+              <div *ngIf="submitted && f['role'].errors" class="invalid-feedback">
+                <div *ngIf="f['role'].errors['required']">Role is required</div>
+              </div>
+            </div>
+
+            <div class="form-group" *ngIf="f['role'].value === 'employee' || f['role'].value === 'manager'">
+              <label for="financeId">Finance Manager</label>
+              <select 
+                class="form-control" 
+                id="financeId"
+                formControlName="financeId"
+                [class.is-invalid]="submitted && f['financeId'].errors">
+                <option value="">Select Finance Manager</option>
+                <option *ngFor="let finance of financeUsers" [value]="finance._id">
+                  {{ finance.name }} ({{ finance.email }})
+                </option>
+              </select>
+              <div *ngIf="submitted && f['financeId'].errors" class="invalid-feedback">
+                <div *ngIf="f['financeId'].errors['required']">Finance manager is required</div>
+              </div>
+            </div>
+
+            <div class="form-group" *ngIf="f['role'].value === 'employee'">
+              <label for="managerId">Manager</label>
+              <select 
+                class="form-control" 
+                id="managerId"
+                formControlName="managerId"
+                [class.is-invalid]="submitted && f['managerId'].errors">
+                <option value="">Select Manager</option>
+                <option *ngFor="let manager of managers" [value]="manager._id">
+                  {{ manager.name }} ({{ manager.email }})
+                </option>
+              </select>
+              <div *ngIf="submitted && f['managerId'].errors" class="invalid-feedback">
+                <div *ngIf="f['managerId'].errors['required']">Manager is required</div>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
+              Create User
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">Existing Users</h6>
+          <button class="btn btn-sm btn-info" (click)="loadUsers()">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+        </div>
+        <div class="card-body">
+          <div *ngIf="users.length === 0" class="alert alert-info">
+            No users found.
+          </div>
+          <div *ngIf="users.length > 0" class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of users">
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'bg-primary': user.role === 'admin',
+                      'bg-success': user.role === 'manager',
+                      'bg-info': user.role === 'finance',
+                      'bg-secondary': user.role === 'employee'
+                    }">
+                      {{ user.role | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="user.isActive ? 'bg-success' : 'bg-danger'">
+                      {{ user.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm"
+                      [ngClass]="user.isActive ? 'btn-warning' : 'btn-success'"
+                      (click)="toggleUserStatus(user)">
+                      {{ user.isActive ? 'Deactivate' : 'Activate' }}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

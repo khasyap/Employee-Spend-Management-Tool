@@ -1,0 +1,217 @@
+<div class="body-v">
+  <div class="container-fluid">
+  <!-- Tabs Navigation -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="activeTab === 'claims'" (click)="switchTab('claims')">
+            Expense Claims Review
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
+            Purchase Orders Review
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading {{activeTab}}...</p>
+  </div>
+
+  <!-- Claims Content -->
+  <div *ngIf="!loading && activeTab === 'claims'" class="row">
+    <div class="col-md-6">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">Claims for Review</h6>
+          <div class="form-group mb-0">
+            <select class="form-control form-control-sm" [(ngModel)]="claimsStatusFilter" (change)="filterClaims()">
+              <option value="">All Statuses</option>
+              <option value="submitted">Submitted</option>
+              <option value="under_review">Under Review</option>
+              <option value="approved_by_manager">Approved by Manager</option>
+              <option value="rejected_by_manager">Rejected by Manager</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+          <div *ngFor="let claim of filteredClaims" class="card mb-3 cursor-pointer" 
+               [class.border-primary]="selectedClaim?._id === claim._id"
+               (click)="selectClaim(claim)">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Claim #{{ claim._id | slice: -6 }}</h6>
+                <span class="badge" [ngClass]="getStatusBadgeClass(claim.status)">
+                  {{ claim.status | titlecase }}
+                </span>
+              </div>
+              <div class="mt-2">
+  <strong>Employee:</strong> {{ getEmployeeName(claim) }}<br>
+  <strong>Amount:</strong> {{ claim.amount | currency:'USD' }}<br>
+  <strong>Category:</strong> {{ getCategoryName(claim) }}<br>
+  <strong>Submitted:</strong> {{ claim.submittedOn | date:'shortDate' }}
+</div>
+            </div>
+          </div>
+          <div *ngIf="filteredClaims.length === 0" class="text-center text-muted py-4">
+            No claims found for review.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow mb-4" *ngIf="selectedClaim">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Claim Details #{{ selectedClaim._id | slice: -6 }}</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <strong>Employee:</strong> {{ selectedClaim.employeeDetails?.name || 'Unknown' }}<br>
+            <strong>Department:</strong> {{ selectedClaim.employeeDetails?.department || 'Unknown' }}<br>
+            <strong>Amount:</strong> {{ selectedClaim.amount | currency:'USD' }}<br>
+            <strong>Category:</strong> {{ selectedClaim.categoryDetails?.name || 'Unknown' }}<br>
+            <strong>Submitted:</strong> {{ selectedClaim.submittedOn | date:'fullDate' }}<br>
+            <strong>Status:</strong> 
+            <span class="badge" [ngClass]="getStatusBadgeClass(selectedClaim.status)">
+              {{ selectedClaim.status | titlecase }}
+            </span>
+          </div>
+
+          <div class="mb-3">
+            <strong>Description:</strong>
+            <p class="border p-2 rounded">{{ selectedClaim.description }}</p>
+          </div>
+
+          <div class="mb-3">
+            <strong>Decision Comment:</strong>
+            <textarea class="form-control" [(ngModel)]="decisionComment" rows="3" 
+                      placeholder="Enter your decision comments here"></textarea>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-success" (click)="approveClaim()" 
+                    [disabled]="!decisionComment.trim()">
+              <i class="fas fa-check me-1"></i> Approve
+            </button>
+            <button class="btn btn-danger" (click)="rejectClaim()"
+                    [disabled]="!decisionComment.trim()">
+              <i class="fas fa-times me-1"></i> Reject
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow mb-4" *ngIf="!selectedClaim">
+        <div class="card-body text-center text-muted py-5">
+          <i class="fas fa-info-circle fa-2x mb-3"></i>
+          <p>Select a claim from the list to review and make a decision.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Content -->
+  <div *ngIf="!loading && activeTab === 'orders'" class="row">
+    <div class="col-md-6">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">Orders for Review</h6>
+          <div class="form-group mb-0">
+            <select class="form-control form-control-sm" [(ngModel)]="ordersStatusFilter" (change)="filterOrders()">
+              <option value="">All Statuses</option>
+              <option value="submitted">Submitted</option>
+              <option value="under_review">Under Review</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+          <div *ngFor="let order of filteredOrders" class="card mb-3 cursor-pointer" 
+               [class.border-primary]="selectedOrder?._id === order._id"
+               (click)="selectOrder(order)">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Order #{{ order._id | slice: -6 }}</h6>
+                <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                  {{ order.status | titlecase }}
+                </span>
+              </div>
+              <div class="mt-2">
+                <strong>Employee:</strong> {{ getEmployeeName(order) }}<br>
+              <strong>Item:</strong> {{ order.item }}<br>
+              <strong>Vendor:</strong> {{ getVendorName(order) }}<br>
+              <strong>Amount:</strong> {{ order.amount | currency:'USD' }}<br>
+              <strong>Submitted:</strong> {{ order.createdAt | date:'shortDate' }}
+              </div>
+            </div>
+          </div>
+          <div *ngIf="filteredOrders.length === 0" class="text-center text-muted py-4">
+            No orders found for review.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow mb-4" *ngIf="selectedOrder">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Order Details #{{ selectedOrder._id | slice: -6 }}</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+             <strong>Employee:</strong> {{ getEmployeeName(selectedOrder) }}<br>
+          <strong>Department:</strong> {{ getEmployeeDepartment(selectedOrder) }}<br>
+          <strong>Item:</strong> {{ selectedOrder.item }}<br>
+          <strong>Vendor:</strong> {{ getVendorName(selectedOrder) }}<br>
+          <strong>Amount:</strong> {{ selectedOrder.amount | currency:'USD' }}<br>
+          <strong>Submitted:</strong> {{ selectedOrder.createdAt | date:'fullDate' }}<br>
+          <strong>Status:</strong> 
+            <span class="badge" [ngClass]="getStatusBadgeClass(selectedOrder.status)">
+              {{ selectedOrder.status | titlecase }}
+            </span>
+          </div>
+
+          <div class="mb-3">
+            <strong>Description:</strong>
+            <p class="border p-2 rounded">{{ selectedOrder.description || 'No description provided' }}</p>
+          </div>
+
+          <div class="mb-3">
+            <strong>Decision Comment:</strong>
+            <textarea class="form-control" [(ngModel)]="decisionComment" rows="3" 
+                      placeholder="Enter your decision comments here"></textarea>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-success" (click)="approveOrder()" 
+                    [disabled]="!decisionComment.trim()">
+              <i class="fas fa-check me-1"></i> Approve
+            </button>
+            <button class="btn btn-danger" (click)="rejectOrder()"
+                    [disabled]="!decisionComment.trim()">
+              <i class="fas fa-times me-1"></i> Reject
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow mb-4" *ngIf="!selectedOrder">
+        <div class="card-body text-center text-muted py-5">
+          <i class="fas fa-info-circle fa-2x mb-3"></i>
+          <p>Select an order from the list to review and make a decision.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

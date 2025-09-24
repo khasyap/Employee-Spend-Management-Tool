@@ -1,0 +1,46 @@
+/* Navbar container */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #0d0d0d, #1a1a1a, #262626, #1a1a1a, #0d0d0d);
+  padding: 12px 20px;
+  box-shadow: 0 4px 10px rgba(255, 165, 0, 0.2);
+}
+
+/* Brand/logo */
+.navbar-brand {
+  font-size: 20px;
+  font-weight: bold;
+  color: orange;
+  letter-spacing: 1px;
+}
+
+/* Links */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+/* Hover + Active */
+.nav-links li a:hover,
+.nav-links li a.active {
+  color: orange;
+  border-bottom: 2px solid orange;
+  padding-bottom: 4px;
+}
+
+/* Page content */
+.content {
+  padding: 20px;
+}

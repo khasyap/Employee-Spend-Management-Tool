@@ -1,0 +1,123 @@
+<div class="body-v">
+  <div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Order Services</h2>
+      <hr>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Service Order Form</h6>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="item">Item/Service</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="item"
+                    formControlName="item"
+                    [class.is-invalid]="submitted && f['item'].errors">
+                  <div *ngIf="submitted && f['item'].errors" class="invalid-feedback">
+                    <div *ngIf="f['item'].errors['required']">Item/Service is required</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="vendor">Vendor</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="vendor"
+                    formControlName="vendor"
+                    [class.is-invalid]="submitted && f['vendor'].errors">
+                  <div *ngIf="submitted && f['vendor'].errors" class="invalid-feedback">
+                    <div *ngIf="f['vendor'].errors['required']">Vendor is required</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="amount">Amount (USD)</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="amount"
+                    formControlName="amount"
+                    step="0.01"
+                    min="0"
+                    [class.is-invalid]="submitted && f['amount'].errors">
+                  <div *ngIf="submitted && f['amount'].errors" class="invalid-feedback">
+                    <div *ngIf="f['amount'].errors['required']">Amount is required</div>
+                    <div *ngIf="f['amount'].errors['min']">Amount must be positive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description (Optional)</label>
+              <textarea 
+                class="form-control" 
+                id="description"
+                formControlName="description"
+                rows="3"></textarea>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              Submit Order
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Ordering Guidelines</h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled">
+            <li class="mb-3">
+              <strong>Approval Process:</strong> All orders require manager approval before processing.
+            </li>
+            <li class="mb-3">
+              <strong>Vendor Selection:</strong> Use preferred vendors when available.
+            </li>
+            <li class="mb-3">
+              <strong>Budget Limits:</strong> Ensure orders comply with departmental budget limits.
+            </li>
+            <li class="mb-3">
+              <strong>Lead Time:</strong> Allow 3-5 business days for order approval and processing.
+            </li>
+            <li>
+              <strong>Emergency Orders:</strong> Contact your manager directly for urgent requirements.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

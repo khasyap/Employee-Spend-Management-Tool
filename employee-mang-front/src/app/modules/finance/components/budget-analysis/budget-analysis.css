@@ -1,0 +1,198 @@
+/* ==== Page Container ==== */
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* ==== Headings & Divider ==== */
+h2 {
+  font-weight: 700;
+  color: #0056b3;
+}
+
+hr {
+  border-top: 2px solid #ff7f32;
+  opacity: 0.4;
+}
+
+/* ==== Cards ==== */
+.dashboard-card {
+  border: none;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.dashboard-card .card-header {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 16px 16px 0 0;
+  padding: 10px 15px;
+}
+
+.dashboard-card .card-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ==== Filters (Inputs & Selects) ==== */
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #ccd6e6;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0,86,179,0.25);
+}
+
+/* ==== Buttons ==== */
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 6px 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #0056b3, #4d9fff);
+  border: none;
+  color: #fff;
+}
+
+.btn-secondary {
+  background: linear-gradient(90deg, #6c757d, #a4a9ad);
+  border: none;
+  color: #fff;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* ==== Loading Spinner ==== */
+.spinner-border.text-primary {
+  color: #0056b3 !important;
+  width: 2rem;
+  height: 2rem;
+  border-width: 0.25em;
+}
+
+/* ==== Tables ==== */
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  background: #f7f9fc;
+  font-weight: 600;
+  color: #444;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* ==== Progress Bars ==== */
+.progress-container {
+  width: 100%;
+  height: 14px;
+  background: #f1f5fb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  transition: width 0.4s ease;
+  font-size: 0.75rem;
+  color: #fff;
+  text-align: center;
+  line-height: 14px;
+}
+
+/* Dynamic utilization colors */
+.progress-bar.low {
+  background: linear-gradient(90deg, #28a745, #6ddc91);
+}
+.progress-bar.medium {
+  background: linear-gradient(90deg, #ffc107, #ffd85c);
+}
+.progress-bar.high {
+  background: linear-gradient(90deg, #dc3545, #f58b96);
+}
+
+/* ==== Badges ==== */
+.badge {
+  padding: 0.4em 0.7em;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.bg-success {
+  background: #28a745 !important;
+}
+
+.bg-warning {
+  background: #ffc107 !important;
+  color: #000 !important;
+}
+
+.bg-danger {
+  background: #dc3545 !important;
+}
+
+/* ==== Accordion ==== */
+.accordion-button {
+  font-weight: 600;
+  border-radius: 10px !important;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: #0056b3;
+}
+
+.accordion-button:not(.collapsed) {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff;
+}
+
+/* ==== Budget Bars & Distribution ==== */
+.budget-bar-item .progress-bar {
+  height: 12px;
+}
+
+.distribution-item .progress-container {
+  height: 10px;
+}
+
+.distribution-item .progress-bar.bg-info {
+  background: linear-gradient(90deg, #17a2b8, #6edbe5) !important;
+}
+
+/* ==== Alerts ==== */
+.alert-info {
+  background: #eaf4ff;
+  border: 1px solid #bcdffb;
+  color: #0056b3;
+  border-radius: 10px;
+}

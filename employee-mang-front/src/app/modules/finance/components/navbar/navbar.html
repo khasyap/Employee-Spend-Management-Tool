@@ -1,0 +1,44 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <i class="fas fa-coins me-2"></i>
+      Finance Portal
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#financeNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="financeNavbar">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" routerLink="dashboard" routerLinkActive="active">Dashboard</a></li>
+        
+        <li class="nav-item"><a class="nav-link" routerLink="notifications" routerLinkActive="active">Notifications</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="validate" routerLinkActive="active">Validate Claims</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="cab" routerLinkActive="active">Cab Request</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="budget-analysis" routerLinkActive="active">Budget Analysis</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="finreports" routerLinkActive="active">Reports</a></li>
+      </ul>
+
+      <!-- ✅ User Dropdown (like Employee/Admin) -->
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="financeDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-user-circle me-1"></i>
+            {{ authService.currentUserValue?.name }}
+            <span class="badge bg-secondary ms-1">{{ authService.currentUserValue?.role }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="#" (click)="logout(); $event.preventDefault()">Logout</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid mt-3">
+  <router-outlet></router-outlet>
+</div>

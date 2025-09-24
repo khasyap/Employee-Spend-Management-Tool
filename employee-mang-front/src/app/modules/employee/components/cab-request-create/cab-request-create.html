@@ -1,0 +1,128 @@
+<div class="card">
+  <div class="card-header">
+    <h3>New Cab Request</h3>
+    <a routerLink="/employee/cab-requests" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back to List
+    </a>
+  </div>
+
+  <div class="card-body">
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert alert-success">
+      {{ success }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #requestForm="ngForm">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="requestType">Request Type *</label>
+            <select id="requestType" name="requestType" [(ngModel)]="request.requestType" 
+                    (change)="onRequestTypeChange()" class="form-control" required>
+              <option value="daily">Daily Service</option>
+              <option value="urgent">Urgent Service</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-6" *ngIf="request.requestType === 'daily'">
+          <div class="form-group">
+            <label for="shift">Shift *</label>
+            <select id="shift" name="shift" [(ngModel)]="request.shift" class="form-control" required>
+              <option value="morning">Morning</option>
+              <option value="afternoon">Afternoon</option>
+              <option value="evening">Evening</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="pickupLocation">Pickup Location *</label>
+            <input type="text" id="pickupLocation" name="pickupLocation" 
+                   [(ngModel)]="request.pickupLocation" class="form-control" 
+                   [placeholder]="request.requestType === 'daily' ? 'Company Office (default)' : ''" required>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="dropLocation">Drop Location *</label>
+            <input type="text" id="dropLocation" name="dropLocation" 
+                   [(ngModel)]="request.dropLocation" class="form-control" 
+                   [placeholder]="request.requestType === 'daily' ? 'Company Office (default)' : ''" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="pickupTime">Pickup Date & Time *</label>
+            <input type="datetime-local" id="pickupTime" name="pickupTime" 
+                   [(ngModel)]="request.pickupTime" class="form-control" 
+                   [min]="minDate" required>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="returnTime">Return Time (Optional)</label>
+            <input type="datetime-local" id="returnTime" name="returnTime" 
+                   [(ngModel)]="request.returnTime" class="form-control" 
+                   [min]="getMinReturnTime()">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea id="description" name="description" [(ngModel)]="request.description" 
+                  class="form-control" rows="3" required
+                  placeholder="Please describe the purpose of your cab request"></textarea>
+      </div>
+
+      <div *ngIf="request.requestType === 'urgent'" class="form-check mb-3">
+        <input type="checkbox" id="isAirportTrip" name="isAirportTrip" 
+               [(ngModel)]="request.isAirportTrip" (change)="onAirportTripChange()" 
+               class="form-check-input">
+        <label for="isAirportTrip" class="form-check-label">This is an airport trip</label>
+      </div>
+
+      <div *ngIf="request.isAirportTrip && request.flightDetails" class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="flightNumber">Flight Number</label>
+            <input type="text" id="flightNumber" name="flightNumber"
+                   [(ngModel)]="request.flightDetails.flightNumber"
+                   class="form-control">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="airline">Airline</label>
+            <input type="text" id="airline" name="airline"
+                   [(ngModel)]="request.flightDetails.airline"
+                   class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" routerLink="/employee/cab-requests" class="btn btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" 
+                [disabled]="isLoading || !isFormValid()">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm"></span>
+          Submit Request
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,268 @@
+<div class="body-v">
+  <!-- budget-analysis.html - Fixed -->
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2><i class="fas fa-chart-line me-2"></i>Budget Analysis</h2>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Date Filters -->
+  <div class="card dashboard-card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Analysis Period</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="fromDate">From Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="fromDate"
+              [(ngModel)]="fromDate">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="toDate">To Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="toDate"
+              [(ngModel)]="toDate">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="categoryFilter">Category</label>
+            <select class="form-control" id="categoryFilter" [(ngModel)]="selectedCategory">
+              <option value="">All Categories</option>
+              <option *ngFor="let item of budgetData" [value]="item.category">{{item.category}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <div>
+              <button
+                class="btn btn-primary"
+                (click)="onFilter()"
+                [disabled]="loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                Analyze
+              </button>
+              <button
+                class="btn btn-secondary ms-2"
+                (click)="resetFilter()">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && budgetData.length > 0" class="row">
+    <!-- Budget Summary -->
+    <div class="col-12">
+      <div class="card dashboard-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-table me-2"></i>Budget Utilization Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Budget Limit</th>
+                  <th>Amount Used</th>
+                  <th>Remaining Budget</th>
+                  <th>Extra Used</th>
+                  <th>Utilization %</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of budgetData">
+                  <td>{{ item.category }}</td>
+                  <td>{{ formatCurrency(item.limit) }}</td>
+                  <td>{{ formatCurrency(item.used) }}</td>
+                  <td>{{ formatCurrency(item.remaining) }}</td>
+                  <td [class.text-danger]="item.extraUsed > 0">
+                    {{ formatCurrency(item.extraUsed) }}
+                  </td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar"
+                           [ngClass]="getProgressBarClass(item.utilization)"
+                           [style.width.%]="item.utilization">
+                        {{ item.utilization }}%
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'bg-success': item.utilization < 75,
+                      'bg-warning': item.utilization >= 75 && item.utilization < 90,
+                      'bg-danger': item.utilization >= 90
+                    }">
+                      {{
+                        item.utilization < 75 ? 'Good' :
+                        item.utilization >= 90 ? 'Critical' : 'Warning'
+                      }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="table-primary">
+                  <th>Total</th>
+                  <th>{{ formatCurrency(getTotalLimit()) }}</th>
+                  <th>{{ formatCurrency(getTotalUsed()) }}</th>
+                  <th>{{ formatCurrency(getTotalRemaining()) }}</th>
+                  <th [class.text-danger]="getTotalExtraUsed() > 0">
+                    {{ formatCurrency(getTotalExtraUsed()) }}
+                  </th>
+                  <th>{{ getUsagePercentage(getTotalUsed(), getTotalLimit()) }}%</th>
+                  <th>
+                    <span class="badge" [ngClass]="{
+                      'bg-success': getUsagePercentage(getTotalUsed(), getTotalLimit()) < 75,
+                      'bg-warning': getUsagePercentage(getTotalUsed(), getTotalLimit()) >= 75 && getUsagePercentage(getTotalUsed(), getTotalLimit()) < 90,
+                      'bg-danger': getUsagePercentage(getTotalUsed(), getTotalLimit()) >= 90
+                    }">
+                      {{
+                        getUsagePercentage(getTotalUsed(), getTotalLimit()) < 75 ? 'Good' :
+                        getUsagePercentage(getTotalUsed(), getTotalLimit()) >= 90 ? 'Critical' : 'Warning'
+                      }}
+                    </span>
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Usage Details -->
+    <div class="col-12 mb-4" *ngIf="hasEmployeeUsage()">
+      <div class="card dashboard-card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-users me-2"></i>Employee Budget Usage</h5>
+        </div>
+        <div class="card-body">
+          <div class="accordion" id="employeeUsageAccordion">
+            <div class="accordion-item" *ngFor="let category of budgetData; let i = index">
+              <h2 class="accordion-header" id="heading{{i}}">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                        [attr.data-bs-target]="'#collapse' + i" aria-expanded="false" 
+                        [attr.aria-controls]="'collapse' + i">
+                  {{category.category}} - Employee Usage
+                </button>
+              </h2>
+              <div [id]="'collapse' + i" class="accordion-collapse collapse" 
+                   [attr.aria-labelledby]="'heading' + i" data-bs-parent="#employeeUsageAccordion">
+                <div class="accordion-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Employee</th>
+                          <th>Amount Used</th>
+                          <th>Percentage of Category</th>
+                          <th>Extra Used</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let employee of category.employeeUsage">
+                          <td>{{ employee.employeeName }}</td>
+                          <td>{{ formatCurrency(employee.used) }}</td>
+                          <td>{{ employee.percentage }}%</td>
+                          <td [class.text-danger]="employee.extraUsed > 0">
+                            {{ formatCurrency(employee.extraUsed) }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visualizations -->
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Budget Utilization by Category</h5>
+        </div>
+        <div class="card-body">
+          <div class="budget-bars">
+            <div *ngFor="let item of budgetData" class="budget-bar-item mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="small">{{ item.category }}</span>
+                <span class="small">{{ item.utilization }}%</span>
+              </div>
+              <div class="progress-container">
+                <div class="progress-bar"
+                     [ngClass]="getProgressBarClass(item.utilization)"
+                     [style.width.%]="item.utilization">
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">{{ formatCurrency(item.used) }} of {{ formatCurrency(item.limit) }}</small>
+                <small class="text-danger" *ngIf="item.extraUsed > 0">
+                  +{{ formatCurrency(item.extraUsed) }} extra
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Budget Distribution</h5>
+        </div>
+        <div class="card-body">
+          <div class="budget-distribution">
+            <div *ngFor="let item of budgetData" class="distribution-item mb-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="small">{{ item.category }}</span>
+                <span class="small">{{ formatCurrency(item.limit) }}</span>
+              </div>
+              <div class="progress-container">
+                <div class="progress-bar bg-info"
+                     [style.width.%]="getUsagePercentage(item.limit, getTotalLimit())">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && budgetData.length === 0" class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    No budget data available for the selected period. Try adjusting your date filters.
+  </div>
+</div>
+</div>

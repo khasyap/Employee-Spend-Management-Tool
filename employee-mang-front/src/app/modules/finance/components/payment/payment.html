@@ -1,0 +1,209 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Process Payment</h2>
+      <hr>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <!-- Claim Details -->
+      <div class="card shadow mb-4" *ngIf="claimDetails">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Claim Details</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <strong>Employee:</strong> {{ getEmployeeName(claimDetails) }}<br>
+            <strong>Category:</strong> {{ getCategoryName(claimDetails) }}<br>
+            <strong>Amount:</strong> {{ formatCurrency(claimDetails.amount) }}<br>
+            <strong>Description:</strong> {{ claimDetails.description }}<br>
+            <strong>Status:</strong> 
+            <span class="badge" [ngClass]="getStatusBadgeClass(claimDetails.status)">
+              {{ claimDetails.status | titlecase }}
+            </span><br>
+            <strong>Submitted:</strong> {{ claimDetails.submittedOn | date:'medium' }}<br>
+          </div>
+
+          <div *ngIf="claimDetails.billUrl" class="mb-3">
+            <strong>Bill Attachment:</strong>
+            <a [href]="claimDetails.billUrl" target="_blank" class="btn btn-sm btn-info ms-2">
+              View Bill
+            </a>
+          </div>
+
+          <!-- Employee Payment Details -->
+          <div class="mt-4" *ngIf="employeePaymentDetails">
+            <h6 class="text-primary">Employee Payment Details</h6>
+            <div *ngIf="employeePaymentDetails.paymentDetails?.upiId">
+              <strong>UPI ID:</strong> {{ employeePaymentDetails.paymentDetails.upiId }}
+            </div>
+            <div *ngIf="employeePaymentDetails.paymentDetails?.bankAccount?.accountNumber">
+              <strong>Bank Account:</strong> {{ employeePaymentDetails.paymentDetails.bankAccount.accountNumber }}
+              ({{ employeePaymentDetails.paymentDetails.bankAccount.bankName }})
+            </div>
+            <div *ngIf="!employeePaymentDetails.paymentDetails?.upiId && 
+                        !employeePaymentDetails.paymentDetails?.bankAccount?.accountNumber">
+              <span class="text-warning">No payment details configured for this employee</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <!-- Payment Form -->
+      <div class="card shadow">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Payment Information</h6>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+
+            <div class="form-group">
+              <label for="paymentMethod">Payment Method *</label>
+              <select 
+                class="form-control" 
+                id="paymentMethod"
+                formControlName="paymentMethod"
+                [class.is-invalid]="submitted && f['paymentMethod'].errors">
+                <option value="">Select Payment Method</option>
+                <option *ngFor="let method of paymentMethods" [value]="method.value">
+                  {{ method.label }}
+                </option>
+              </select>
+              <div *ngIf="submitted && f['paymentMethod'].errors" class="invalid-feedback">
+                Payment method is required
+              </div>
+            </div>
+
+            <!-- Loading indicator for finance user details -->
+            <div *ngIf="loadingFinanceUser" class="text-center my-3">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading payment details...</span>
+              </div>
+              <p class="mt-2">Loading payment details...</p>
+            </div>
+
+            <!-- UPI QR Code Section -->
+            <div *ngIf="selectedMethod === 'upi'" class="border p-3 mt-3 rounded bg-light">
+              <h6 class="mb-3">UPI Payment</h6>
+              
+              <div *ngIf="getPaymentDetails()?.upiId; else noUpiId">
+                <p>Please scan the QR code below to make payment via UPI:</p>
+                
+                <div class="text-center">
+                  <!-- QR Code container -->
+                  <canvas #qrcode id="qrcode"></canvas>
+                  
+                  <div class="mt-2">
+                    <small class="text-muted">UPI ID: {{ getPaymentDetails().upiId }}</small>
+                  </div>
+                  
+                  <div class="mt-3">
+                    <p class="mb-1"><strong>Amount to pay:</strong> {{ formatCurrency(claimDetails?.amount) }}</p>
+                    <p class="mb-0"><strong>Recipient:</strong> {{ getRecipientName() }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <ng-template #noUpiId>
+                <div class="alert alert-warning">
+                  UPI ID not configured. Please contact administrator.
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Bank Transfer Details -->
+            <div *ngIf="selectedMethod === 'bank_transfer'" class="border p-3 mt-3 rounded bg-light">
+              <h6 class="mb-3">Bank Transfer Details</h6>
+              
+              <div *ngIf="getPaymentDetails()?.bankAccount; else noBankAccount">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><strong>Account Holder:</strong><br> {{ getPaymentDetails().bankAccount.accountHolderName || getRecipientName() }}</p>
+                    <p><strong>Account Number:</strong><br> {{ getPaymentDetails().bankAccount.accountNumber }}</p>
+                  </div>
+                  <div class="col-md-6">
+                    <p><strong>Bank Name:</strong><br> {{ getPaymentDetails().bankAccount.bankName }}</p>
+                    <p><strong>IFSC Code:</strong><br> {{ getPaymentDetails().bankAccount.ifscCode }}</p>
+                  </div>
+                </div>
+                
+                <div class="mt-3">
+                  <p class="mb-1"><strong>Amount to transfer:</strong> {{ formatCurrency(claimDetails?.amount) }}</p>
+                  <p class="mb-0 text-muted">Please include the claim ID ({{ claimId }}) in the transfer reference.</p>
+                </div>
+              </div>
+              
+              <ng-template #noBankAccount>
+                <div class="alert alert-warning">
+                  Bank account details not configured. Please contact administrator.
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Check Payment -->
+            <div *ngIf="selectedMethod === 'check'" class="border p-3 mt-3 rounded bg-light">
+              <h6 class="mb-3">Check Payment</h6>
+              <p>Please make the check payable to:</p>
+              <p class="mb-1"><strong>Payee:</strong> {{ getRecipientName() }}</p>
+              <p class="mb-1"><strong>Amount:</strong> {{ formatCurrency(claimDetails?.amount) }}</p>
+              <p class="mb-0 text-muted">Please include the claim ID ({{ claimId }}) in the memo field.</p>
+            </div>
+
+            <!-- Cash Payment -->
+            <div *ngIf="selectedMethod === 'cash'" class="border p-3 mt-3 rounded bg-light">
+              <h6 class="mb-3">Cash Payment</h6>
+              <p>Please process a cash payment of:</p>
+              <p class="mb-1"><strong>Amount:</strong> {{ formatCurrency(claimDetails?.amount) }}</p>
+              <p class="mb-0 text-muted">Please obtain a receipt for the cash transaction.</p>
+            </div>
+
+            <div class="form-group mt-3">
+              <label for="paymentDate">Payment Date *</label>
+              <input 
+                type="date" 
+                class="form-control" 
+                id="paymentDate"
+                formControlName="paymentDate"
+                [class.is-invalid]="submitted && f['paymentDate'].errors">
+              <div *ngIf="submitted && f['paymentDate'].errors" class="invalid-feedback">
+                Payment date is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="comment">Comments (Optional)</label>
+              <textarea 
+                class="form-control" 
+                id="comment"
+                formControlName="comment"
+                rows="3"></textarea>
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="loading || !claimDetails || claimDetails.status !== 'approved_by_finance'">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              Process Payment
+            </button>
+
+            <div *ngIf="claimDetails && claimDetails.status !== 'approved_by_finance'" class="alert alert-warning mt-3">
+              Only claims with status "Approved by Finance" can be paid.
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

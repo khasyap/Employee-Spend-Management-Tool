@@ -1,0 +1,402 @@
+<div class="body-v">
+  <div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2><i class="fas fa-tachometer-alt me-2"></i>Employee Dashboard</h2>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Connection Status -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="d-flex align-items-center">
+        <span class="status-indicator" [class.status-online]="connectionStatus" 
+              [class.status-offline]="!connectionStatus"></span>
+        <span class="connection-status" [class.connected]="connectionStatus" 
+              [class.disconnected]="!connectionStatus">
+          {{ connectionStatus ? 'LIVE' : 'OFFLINE' }}
+        </span>
+        <small class="text-muted ms-2">Real-time updates</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Navigation -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card dashboard-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between flex-wrap">
+            <a routerLink="/employee/raise-claim" class="btn btn-primary mb-2">
+              <i class="fas fa-plus me-2"></i>Raise New Claim
+            </a>
+            <a routerLink="/employee/upload-bill" class="btn btn-info mb-2">
+              <i class="fas fa-upload me-2"></i>Upload Bill
+            </a>
+            <a routerLink="/employee/track-claims" class="btn btn-success mb-2">
+              <i class="fas fa-list me-2"></i>Track Claims
+            </a>
+            <a routerLink="/employee/order-services" class="btn btn-warning mb-2">
+              <i class="fas fa-shopping-cart me-2"></i>Order Services
+            </a>
+            <a routerLink="/employee/path/create" class="btn btn-secondary mb-2">
+              <i class="fas fa-tasks me-2"></i>Track Orders
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && dashboardData" class="row">
+    <!-- Statistics Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Total Claims</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.totalClaims !== undefined">
+                {{ formatNumber(dashboardData.totalClaims || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-file-invoice-dollar fa-2x text-primary"></i>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" [style.width.%]="getPercentage(dashboardData.approvedClaims || 0, dashboardData.totalClaims || 1)"></div>
+          </div>
+          <small>Approval Rate: {{ getPercentage(dashboardData.approvedClaims || 0, dashboardData.totalClaims || 1) }}%</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Approved Claims</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.approvedClaims !== undefined">
+                {{ formatNumber(dashboardData.approvedClaims || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-check-circle fa-2x text-success"></i>
+            </div>
+          </div>
+          <div class="sparkline">
+            <div *ngFor="let bar of [30, 45, 60, 35, 70, 55, 65]" 
+                 class="sparkline-bar" [style.height.px]="bar * 0.3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Pending Claims</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.pendingClaims !== undefined">
+                {{ formatNumber(dashboardData.pendingClaims || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-clock fa-2x text-warning"></i>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar bg-warning" [style.width.%]="getPercentage(dashboardData.pendingClaims || 0, dashboardData.totalClaims || 1)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Total Amount</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.totalAmount !== undefined">
+                {{ formatCurrency(dashboardData.totalAmount || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-dollar-sign fa-2x text-info"></i>
+            </div>
+          </div>
+          <div class="mini-chart mt-2">
+            <div *ngFor="let bar of [40, 60, 35, 75, 50, 65, 45]" 
+                 class="chart-bar" [style.height.px]="bar * 0.4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Statistics -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Total Orders</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.totalOrders !== undefined">
+                {{ formatNumber(dashboardData.totalOrders || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" [style.width.%]="getPercentage(dashboardData.approvedOrders || 0, dashboardData.totalOrders || 1)"></div>
+          </div>
+          <small>Approval Rate: {{ getPercentage(dashboardData.approvedOrders || 0, dashboardData.totalOrders || 1) }}%</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Pending Orders</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.pendingOrders !== undefined">
+                {{ formatNumber(dashboardData.pendingOrders || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-clock fa-2x text-warning"></i>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar bg-warning" [style.width.%]="getPercentage(dashboardData.pendingOrders || 0, dashboardData.totalOrders || 1)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Add these cards after the existing statistics cards -->
+
+<!-- Order Amount Statistics -->
+<div class="col-xl-3 col-md-6 mb-4">
+  <div class="card dashboard-card h-100">
+    <div class="card-body">
+      <div class="d-flex align-items-center">
+        <div class="flex-grow-1">
+          <h6 class="text-muted mb-1">Total Order Amount</h6>
+          <h3 class="realtime-number" [class.updated]="dashboardData.totalOrderAmount !== undefined">
+            {{ formatCurrency(dashboardData.totalOrderAmount || 0) }}
+          </h3>
+        </div>
+        <div class="flex-shrink-0">
+          <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+        </div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" [style.width.%]="getPercentage(dashboardData.approvedOrders || 0, dashboardData.totalOrders || 1)"></div>
+      </div>
+      <small>Approval Rate: {{ getPercentage(dashboardData.approvedOrders || 0, dashboardData.totalOrders || 1) }}%</small>
+    </div>
+  </div>
+</div>
+
+<div class="col-xl-3 col-md-6 mb-4">
+  <div class="card dashboard-card h-100">
+    <div class="card-body">
+      <div class="d-flex align-items-center">
+        <div class="flex-grow-1">
+          <h6 class="text-muted mb-1">Monthly Order Amount</h6>
+          <h3 class="realtime-number" [class.updated]="dashboardData.monthlyOrderAmount !== undefined">
+            {{ formatCurrency(dashboardData.monthlyOrderAmount || 0) }}
+          </h3>
+        </div>
+        <div class="flex-shrink-0">
+          <i class="fas fa-calendar fa-2x text-info"></i>
+        </div>
+      </div>
+      <div class="mini-chart mt-2">
+        <div *ngFor="let bar of [40, 60, 35, 75, 50, 65, 45]" 
+             class="chart-bar" [style.height.px]="bar * 0.4"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- Status Analysis -->
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Claim Status Analysis</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div *ngFor="let status of ['submitted', 'under_review', 'approved', 'rejected', 'paid']" 
+                 class="col-6 mb-3">
+              <div class="text-center">
+                <div class="h4 text-primary mb-1">
+                  {{ dashboardData.statusAnalysis?.[status] || 0 }}
+                </div>
+                <div class="small text-muted text-uppercase">
+                  {{ status.replace('_', ' ') }}
+                </div>
+                <div class="progress-container mt-1">
+                  <div class="progress-bar" [style.width.%]="getPercentage(
+                    dashboardData.statusAnalysis?.[status] || 0, 
+                    dashboardData.totalClaims || 1
+                  )"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Summary -->
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-calendar me-2"></i>Monthly Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6">
+              <div class="text-center p-3 border rounded">
+                <div class="text-primary font-weight-bold h5">{{ formatCurrency(dashboardData.monthlyAmount || 0) }}</div>
+                <div class="text-muted">This Month</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="text-center p-3 border rounded">
+                <div class="text-success font-weight-bold h5">{{ formatCurrency(dashboardData.averageClaim || 0) }}</div>
+                <div class="text-muted">Average Claim</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Claims -->
+    <div class="col-lg-8 mb-4">
+      <div class="card dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Recent Claims</h5>
+          <a routerLink="/employee/track-claims" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let claim of dashboardData.recentClaims">
+                  <td>{{ claim.category?.name || 'N/A' }}</td>
+                  <td>{{ formatCurrency(claim.amount) }}</td>
+                  <td>{{ claim.description }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(claim.status)">
+                      {{ claim.status | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ claim.submittedOn | date:'short' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="col-lg-4 mb-4">
+      <div class="card dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Recent Orders</h5>
+          <a routerLink="/employee/track-orders" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div class="card-body">
+          <div *ngIf="dashboardData.recentOrders && dashboardData.recentOrders.length === 0" class="text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>No recent orders
+          </div>
+          <div *ngFor="let order of dashboardData.recentOrders" class="mb-3 pb-3 border-bottom">
+            <div class="d-flex justify-content-between">
+              <strong>{{ order.item }}</strong>
+              <span class="badge" [ngClass]="{
+                'bg-warning': order.status === 'submitted',
+                'bg-success': order.status === 'approved',
+                'bg-danger': order.status === 'rejected',
+                'bg-primary': order.status === 'fulfilled'
+              }">
+                {{ order.status }}
+              </span>
+            </div>
+            <div class="text-muted small">{{ order.vendor }}</div>
+            <div class="d-flex justify-content-between mt-1">
+              <span>{{ formatCurrency(order.amount) }}</span>
+              <small>{{ order.createdAt | date:'short' }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-time Updates -->
+    <div class="col-12">
+      <div class="card dashboard-card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Real-time Updates</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="realtimeUpdates.length === 0" class="text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>No recent updates
+          </div>
+          <div *ngFor="let update of realtimeUpdates" class="mb-3 p-3 border rounded">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="small text-muted">{{ update.timestamp | date:'medium' }}</div>
+                <span class="font-weight-bold text-primary">{{ update.event | titlecase }}</span>
+                <div *ngIf="update.data" class="small mt-1">
+                  <span *ngIf="update.data.amount">
+                    <strong>Amount:</strong> {{ formatCurrency(update.data.amount) }}
+                  </span>
+                  <span *ngIf="update.data.status" class="ms-2">
+                    <strong>Status:</strong> 
+                    <span class="badge" [ngClass]="getStatusBadgeClass(update.data.status)">
+                      {{ update.data.status | titlecase }}
+                    </span>
+                  </span>
+                  <span *ngIf="update.data.item" class="ms-2">
+                    <strong>Item:</strong> {{ update.data.item }}
+                  </span>
+                </div>
+              </div>
+              <i class="fas fa-circle text-success" *ngIf="update.event === 'claim.created' || update.event === 'order.created'"></i>
+              <i class="fas fa-sync-alt text-warning" *ngIf="update.event === 'claim.updated' || update.event === 'order.updated'"></i>
+              <i class="fas fa-check-circle text-primary" *ngIf="update.event === 'payment.paid'"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

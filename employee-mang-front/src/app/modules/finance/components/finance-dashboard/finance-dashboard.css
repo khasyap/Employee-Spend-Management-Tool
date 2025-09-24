@@ -1,0 +1,139 @@
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+h2 i {
+  color: #0056b3;
+}
+/* Notification bell */
+.btn-primary {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  border: none;
+  border-radius: 10px;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #004494, #e56720);
+}
+
+/* Connection status dot */
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.status-online { background-color: #28a745; }
+.status-offline { background-color: #dc3545; }
+
+.connection-status.connected { color: #28a745; font-weight: 600; }
+.connection-status.disconnected { color: #dc3545; font-weight: 600; }
+.dashboard-card {
+  border-radius: 16px;
+  border: none;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: all 0.3s ease-in-out;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Card header */
+.dashboard-card .card-header {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff !important;
+  border-radius: 16px 16px 0 0;
+  font-weight: 600;
+}
+.realtime-number {
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+.progress-container {
+  background-color: #f1f1f1;
+  height: 8px;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  transition: width 0.6s ease;
+}
+.mini-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 40px;
+}
+
+.chart-bar {
+  flex: 1;
+  background: linear-gradient(180deg, #ff7f32, #ffd7c2);
+  border-radius: 4px;
+}
+.sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 35px;
+}
+
+.sparkline-bar {
+  flex: 1;
+  background: linear-gradient(180deg, #0056b3, #c2d7ff);
+  border-radius: 3px;
+}
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table thead {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff;
+}
+
+.table tbody tr:hover {
+  background-color: #f9fbff;
+}
+.badge {
+  padding: 0.4em 0.7em;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-success { background-color: #28a745; }
+.badge-warning { background-color: #ffc107; }
+.badge-danger  { background-color: #dc3545; }
+.badge-info    { background-color: #17a2b8; }
+.badge-primary { background: linear-gradient(90deg, #0056b3, #ff7f32); }
+.card .border {
+  border: 1px solid #e5e5e5 !important;
+  background-color: #fdfdfd;
+  transition: all 0.3s ease;
+}
+
+.card .border:hover {
+  background-color: #f9fbff;
+  border-color: #0056b3 !important;
+}
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  min-height: 100vh;
+  padding-bottom: 30px;
+}

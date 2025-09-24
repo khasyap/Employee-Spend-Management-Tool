@@ -1,0 +1,105 @@
+<div class="card">
+  <div class="card-header">
+    <h3>Team Cab Requests</h3>
+    <div class="filter-section">
+      <label for="statusFilter">Filter by Status:</label>
+      <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()" class="form-select">
+        <option value="">All</option>
+        <option value="submitted">Submitted</option>
+        <option value="under_review">Under Review</option>
+        <option value="approved_by_manager">Approved</option>
+        <option value="rejected_by_manager">Rejected</option>
+        <option value="cab_assigned">Cab Assigned</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!isLoading && !error && cabRequests.length === 0" class="empty-state">
+      <i class="fas fa-taxi"></i>
+      <h4>No Cab Requests Found</h4>
+      <p>There are no cab requests from your team members.</p>
+    </div>
+
+    <div *ngIf="!isLoading && cabRequests.length > 0" class="requests-list">
+      <div *ngFor="let request of cabRequests" class="request-card">
+        <div class="request-header">
+          <h5>{{ request.requestType | titlecase }} Service - {{ getEmployeeName(request.employeeId) }}</h5>
+          <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+            {{ normalizeStatus(request.status) | titlecase }}
+          </span>
+        </div>
+
+        <div class="request-details">
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Employee:</strong> {{ getEmployeeName(request.employeeId) }}
+            </div>
+            <div class="detail-item">
+              <strong>Type:</strong> {{ request.requestType | titlecase }}
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Pickup:</strong> {{ request.pickupLocation }}
+            </div>
+            <div class="detail-item">
+              <strong>Drop:</strong> {{ request.dropLocation }}
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Pickup Time:</strong> {{ request.pickupTime | date:'medium' }}
+            </div>
+            <div *ngIf="request.shift" class="detail-item">
+              <strong>Shift:</strong> {{ request.shift | titlecase }}
+            </div>
+          </div>
+
+          <div *ngIf="request.description" class="detail-item">
+            <strong>Description:</strong> {{ request.description }}
+          </div>
+        </div>
+
+        <div class="request-actions" *ngIf="request.status === 'submitted' || request.status === 'under_review'">
+          <button (click)="approveRequest(request)" class="btn btn-sm btn-success">
+            Approve
+          </button>
+          <button (click)="rejectRequest(request)" class="btn btn-sm btn-danger">
+            Reject
+          </button>
+        </div>
+
+        <div *ngIf="request.cancellationRequests && request.cancellationRequests.length > 0" 
+             class="cancellation-requests">
+          <h6>Pending Cancellation Requests</h6>
+         <ng-container *ngFor="let cancellation of request.cancellationRequests">
+  <div class="cancellation-item" *ngIf="cancellation.status === 'pending'">
+    <div class="cancellation-details">
+      <strong>Date:</strong> {{ cancellation.date | date:'mediumDate' }} |
+      <strong>Type:</strong> {{ normalizeText(cancellation.requestType) | titlecase }} |
+      <strong>Reason:</strong> {{ cancellation.reason }}
+    </div>
+    <div class="cancellation-actions">
+      <button [routerLink]="['/manager/cab-requests', request._id]" 
+              class="btn btn-sm btn-outline-primary">
+        Manage
+      </button>
+    </div>
+  </div>
+</ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

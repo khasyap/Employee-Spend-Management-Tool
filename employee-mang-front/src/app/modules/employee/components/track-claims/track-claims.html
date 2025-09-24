@@ -1,0 +1,213 @@
+<div class="body-v">
+  <!-- Tabs Navigation -->
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="activeTab === 'claims'" (click)="switchTab('claims')">
+          Expense Claims
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
+          Purchase Orders
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Loading Indicator -->
+<div *ngIf="loading" class="text-center py-4">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p class="mt-2">Loading {{activeTab}}...</p>
+</div>
+
+<!-- Claims Content -->
+<div *ngIf="!loading && activeTab === 'claims'">
+  <div *ngIf="claims.length === 0" class="alert alert-info">
+    No claims found. <a routerLink="/employee/raise-claim">Submit your first claim</a> to get started.
+  </div>
+
+  <div *ngIf="claims.length > 0" class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary">My Expense Claims</h6>
+      <div class="form-group mb-0">
+        <select class="form-control form-control-sm" [(ngModel)]="claimsStatusFilter" (change)="filterClaims()">
+          <option value="">All Statuses</option>
+          <option value="submitted">Submitted</option>
+          <option value="under_review">Under Review</option>
+          <option value="approved_by_manager">Approved by Manager</option>
+          <option value="rejected_by_manager">Rejected by Manager</option>
+          <option value="escalated_to_admin">Escalated to Admin</option>
+          <option value="sent_to_finance">Sent to Finance</option>
+          <option value="approved_by_finance">Approved by Finance</option>
+          <option value="rejected_by_finance">Rejected by Finance</option>
+          <option value="paid">Paid</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body">
+      <div *ngFor="let claim of filteredClaims" class="card mb-4">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Claim #{{ claim._id | slice: -6 }}</h6>
+            <span class="badge" [ngClass]="getStatusBadgeClass(claim.status)">
+              {{ claim.status | titlecase }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <strong>Category:</strong> 
+              <span *ngIf="!categoriesLoading">{{ getCategoryName(claim) }}</span>
+              <span *ngIf="categoriesLoading" class="text-muted">
+                <i class="fas fa-spinner fa-spin me-1"></i>Loading...
+              </span>
+            </div>
+            <div class="col-md-4">
+              <strong>Amount:</strong> {{ claim.amount | currency:'USD' }}
+            </div>
+            <div class="col-md-4">
+              <strong>Submitted:</strong> {{ claim.submittedOn | date:'shortDate' }}
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-12">
+              <strong>Description:</strong> {{ claim.description }}
+            </div>
+          </div>
+
+          <!-- Progress Flow Bar -->
+          <div class="progress-flow mb-3">
+            <div class="progress-flow-bar">
+              <div class="progress" style="height: 20px;">
+                <div class="progress-bar" 
+                     [ngClass]="getProgressBarClass(claim.status)"
+                     [style.width.%]="getOverallProgress(claim.status, 'claim')"
+                     role="progressbar">
+                  {{ getOverallProgress(claim.status, 'claim') }}%
+                </div>
+              </div>
+            </div>
+            
+            <div class="flow-steps">
+              <div *ngFor="let step of getFlowSteps('claim', claim.status)" 
+                   class="flow-step" [class.active]="step.active">
+                <div class="step-indicator" [class]="step.statusClass">
+                  <i class="fas {{ step.icon }}"></i>
+                </div>
+                <div class="step-label">{{ step.name }}</div>
+                <div class="step-status" [class]="'status-' + step.statusClass">
+                  {{ step.statusClass | titlecase }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-sm btn-info" [routerLink]="['/employee/claims', claim._id]">
+              <i class="fas fa-eye me-1"></i> View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Orders Content -->
+<div *ngIf="!loading && activeTab === 'orders'">
+  <div *ngIf="orders.length === 0" class="alert alert-info">
+    No purchase orders found. <a routerLink="/employee/raise-order">Submit your first order</a> to get started.
+  </div>
+
+  <div *ngIf="orders.length > 0" class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary">My Purchase Orders</h6>
+      <div class="form-group mb-0">
+        <select class="form-control form-control-sm" [(ngModel)]="ordersStatusFilter" (change)="filterOrders()">
+          <option value="">All Statuses</option>
+          <option value="submitted">Submitted</option>
+          <option value="under_review">Under Review</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+          <option value="processing">Processing</option>
+          <option value="fulfilled">Fulfilled</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body">
+      <div *ngFor="let order of filteredOrders" class="card mb-4">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Order #{{ order._id | slice: -6 }}</h6>
+            <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+              {{ order.status | titlecase }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <strong>Item:</strong> {{ order.item }}
+            </div>
+            <div class="col-md-4">
+              <strong>Vendor:</strong> {{ order.vendor }}
+            </div>
+            <div class="col-md-4">
+              <strong>Amount:</strong> {{ order.amount | currency:'USD' }}
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <strong>Created:</strong> {{ order.createdAt | date:'shortDate' }}
+            </div>
+            <div class="col-md-8">
+              <strong>Description:</strong> {{ order.description || 'No description provided' }}
+            </div>
+          </div>
+
+          <!-- Progress Flow Bar -->
+          <div class="progress-flow mb-3">
+            <div class="progress-flow-bar">
+              <div class="progress" style="height: 20px;">
+                <div class="progress-bar" 
+                     [ngClass]="getProgressBarClass(order.status)"
+                     [style.width.%]="getOverallProgress(order.status, 'order')"
+                     role="progressbar">
+                  {{ getOverallProgress(order.status, 'order') }}%
+                </div>
+              </div>
+            </div>
+            
+            <div class="flow-steps">
+              <div *ngFor="let step of getFlowSteps('order', order.status)" 
+                   class="flow-step" [class.active]="step.active">
+                <div class="step-indicator" [class]="step.statusClass">
+                  <i class="fas {{ step.icon }}"></i>
+                </div>
+                <div class="step-label">{{ step.name }}</div>
+                <div class="step-status" [class]="'status-' + step.statusClass">
+                  {{ step.statusClass | titlecase }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-sm btn-info" [routerLink]="['/employee/orders', order._id]">
+              <i class="fas fa-eye me-1"></i> View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

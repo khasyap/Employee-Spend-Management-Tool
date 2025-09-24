@@ -1,0 +1,245 @@
+<div class="body-v">
+  <div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Connection Status -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="d-flex align-items-center">
+        <span class="status-indicator" [class.status-online]="connectionStatus" 
+              [class.status-offline]="!connectionStatus"></span>
+        <span class="connection-status" [class.connected]="connectionStatus" 
+              [class.disconnected]="!connectionStatus">
+          {{ connectionStatus ? 'LIVE' : 'OFFLINE' }}
+        </span>
+        <small class="text-muted ms-2">Real-time updates</small>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && dashboardData" class="row">
+    <!-- Summary Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Total Users</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.userCounts">
+                {{ formatNumber(dashboardData.totalUsers || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-users fa-2x text-primary"></i>
+            </div>
+          </div>
+          <div class="mini-chart mt-2">
+            <div *ngFor="let bar of generateMiniChart([
+              getUserCount('employee'), 
+              getUserCount('manager'), 
+              getUserCount('finance'),
+              getUserCount('admin')
+            ], 30)" class="chart-bar" [style.height.px]="bar.height"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Total Claims</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.totalClaims !== undefined">
+                {{ formatNumber(dashboardData.totalClaims || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-file-invoice-dollar fa-2x text-success"></i>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" [style.width.%]="getPercentage(dashboardData.paidAmount || 0, dashboardData.totalAmount || 1)"></div>
+          </div>
+          <small>Paid: {{ formatCurrency(dashboardData.paidAmount || 0) }} of {{ formatCurrency(dashboardData.totalAmount || 0) }}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Total Amount</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.totalAmount !== undefined">
+                {{ formatCurrency(dashboardData.totalAmount || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-dollar-sign fa-2x text-warning"></i>
+            </div>
+          </div>
+          <div class="sparkline">
+            <div *ngFor="let bar of generateMiniChart([30, 45, 60, 35, 70, 55, 65], 20)" 
+                 class="sparkline-bar" [style.height.px]="bar.height"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+              <h6 class="text-muted mb-1">Monthly Amount</h6>
+              <h3 class="realtime-number" [class.updated]="dashboardData.monthlyAmount !== undefined">
+                {{ formatCurrency(dashboardData.monthlyAmount || 0) }}
+              </h3>
+            </div>
+            <div class="flex-shrink-0">
+              <i class="fas fa-calendar fa-2x text-info"></i>
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" [style.width.%]="getPercentage(dashboardData.monthlyAmount || 0, 100000)"></div>
+          </div>
+          <small>Monthly budget utilization</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Analysis -->
+    <div class="col-12 mb-4">
+      <div class="card dashboard-card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Claims Status Analysis</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div *ngFor="let status of ['submitted', 'under_review', 'approved', 'rejected', 'paid']" 
+                 class="col-md-2 col-6 mb-3">
+              <div class="text-center">
+                <div class="h4 text-primary mb-1">
+                  {{ dashboardData.statusAnalysis?.[status] || 0 }}
+                </div>
+                <div class="small text-muted text-uppercase">
+                  {{ status.replace('_', ' ') }}
+                </div>
+                <div class="progress-container mt-1">
+                  <div class="progress-bar" [style.width.%]="getPercentage(
+                    dashboardData.statusAnalysis?.[status] || 0, 
+                    dashboardData.totalClaims || 1
+                  )"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Recent Claims</h5>
+        </div>
+        <div class="card-body">
+          <div *ngFor="let claim of dashboardData.recentClaims || []" class="mb-3 pb-3 border-bottom">
+            <div class="d-flex justify-content-between">
+              <strong>{{ claim.employeeId?.name }}</strong>
+              <span class="badge" [ngClass]="{
+                'bg-warning': claim.status === 'submitted',
+                'bg-info': claim.status === 'under_review',
+                'bg-success': claim.status.includes('approved'),
+                'bg-danger': claim.status.includes('rejected'),
+                'bg-primary': claim.status === 'paid'
+              }">
+                {{ claim.status }}
+              </span>
+            </div>
+            <div class="text-muted small">{{ claim.category?.name }}</div>
+            <div class="d-flex justify-content-between mt-1">
+              <span>{{ formatCurrency(claim.amount) }}</span>
+              <small>{{ claim.submittedOn | date:'short' }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Recent Logins</h5>
+        </div>
+        <div class="card-body">
+          <div *ngFor="let login of dashboardData.recentLogins || []" class="mb-3 pb-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <strong>{{ login.userId?.name || login.email }}</strong>
+                <div class="text-muted small">{{ login.userId?.role || 'Unknown' }}</div>
+              </div>
+              <span class="badge" [ngClass]="login.success ? 'bg-success' : 'bg-danger'">
+                {{ login.success ? 'Success' : 'Failed' }}
+              </span>
+            </div>
+            <div class="small text-muted mt-1">
+              {{ login.loginTime | date:'medium' }}
+              <span *ngIf="login.ipAddress"> • {{ login.ipAddress }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real-time Updates -->
+    <div class="col-12">
+      <div class="card dashboard-card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Real-time Updates</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="realtimeUpdates.length === 0" class="text-center text-muted">
+            <i class="fas fa-info-circle me-2"></i>No recent updates
+          </div>
+          <div *ngFor="let update of realtimeUpdates" class="mb-3 p-3 border rounded">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="small text-muted">{{ update.timestamp | date:'medium' }}</div>
+                <span class="font-weight-bold text-primary">{{ update.event | titlecase }}</span>
+                <div *ngIf="update.data" class="small mt-1">
+                  <span *ngIf="update.data.amount">
+                    <strong>Amount:</strong> {{ formatCurrency(update.data.amount) }}
+                  </span>
+                  <span *ngIf="update.data.status" class="ms-2">
+                    <strong>Status:</strong> 
+                    <span class="badge bg-secondary">{{ update.data.status | titlecase }}</span>
+                  </span>
+                </div>
+              </div>
+              <i class="fas fa-circle text-success" *ngIf="update.event === 'claim.created'"></i>
+              <i class="fas fa-sync-alt text-warning" *ngIf="update.event === 'claim.updated'"></i>
+              <i class="fas fa-check-circle text-primary" *ngIf="update.event === 'payment.paid'"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

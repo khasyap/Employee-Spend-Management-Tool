@@ -1,0 +1,83 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Notifications</h2>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Filter and Actions -->
+  <div class="card shadow mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-check">
+            <input 
+              class="form-check-input" 
+              type="checkbox" 
+              id="showUnreadOnly"
+              [(ngModel)]="showUnreadOnly"
+              (change)="toggleFilter()">
+            <label class="form-check-label" for="showUnreadOnly">
+              Show unread notifications only
+            </label>
+          </div>
+        </div>
+        <div class="col-md-6 text-end">
+          <button 
+            class="btn btn-primary"
+            (click)="markAllAsRead()"
+           [disabled]="notifications.length === 0 || !hasUnreadNotifications()">
+            <i class="fas fa-check-double me-2"></i>
+            Mark All as Read
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && notifications.length === 0" class="alert alert-info">
+    No notifications found.
+  </div>
+
+  <div *ngIf="!loading && notifications.length > 0" class="card shadow">
+    <div class="card-body p-0">
+      <div class="list-group list-group-flush">
+        <div 
+          *ngFor="let notification of notifications"
+          class="list-group-item list-group-item-action"
+          [class.list-group-item-light]="notification.read">
+          <div class="d-flex w-100 justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <h6 class="mb-1">
+                <span class="badge me-2" [ngClass]="getBadgeClass(notification.type)">
+                  {{ notification.type | titlecase }}
+                </span>
+                {{ notification.title }}
+              </h6>
+              <p class="mb-1">{{ notification.message }}</p>
+              <small class="text-muted">{{ notification.createdAt | date:'medium' }}</small>
+            </div>
+            <div class="flex-shrink-0 ms-3">
+              <button 
+                *ngIf="!notification.read"
+                class="btn btn-sm btn-outline-primary"
+                (click)="markAsRead(notification)">
+                Mark as Read
+              </button>
+              <span *ngIf="notification.read" class="text-success">
+                <i class="fas fa-check"></i> Read
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

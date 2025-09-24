@@ -1,0 +1,171 @@
+/* Full page layout */
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #41465b, #50648d, #595965); /* deep navy + blue */
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+}
+
+/* Login container */
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(
+    135deg,
+    #0a0f1f 0%,
+    #142850 50%,
+    #0a0f1f 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientFlow 14s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Left Side */
+.login-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Logo with “falling/leaning” style */
+.company-logo {
+  width: 200px; /* bigger */
+  height: auto;
+  margin-bottom: 1.5rem;
+  transform: rotate(-10deg); /* tilted look */
+  filter: drop-shadow(0 0 25px rgba(0, 153, 255, 0.8)); /* blue glow */
+  transition: transform 0.5s ease, filter 0.5s ease;
+}
+.company-logo:hover {
+  transform: rotate(-15deg) scale(1.1); /* more tilt on hover */
+  filter: drop-shadow(0 0 30px rgba(255, 122, 28, 0.9)); /* orange glow */
+}
+
+.company-name {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #ff7a1c;
+  text-shadow: 
+    0 0 25px rgba(255, 122, 28, 0.8),
+    0 0 20px rgba(0, 153, 255, 0.7);
+  letter-spacing: 3px;
+  transform: rotate(-5deg); /* name also slightly tilted */
+}
+/* Right Side */
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Glassmorphism Card */
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(20, 30, 60, 0.6); /* bluish transparent */
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 153, 255, 0.3); /* blue border */
+  box-shadow: 0 0 25px rgba(0, 153, 255, 0.4); /* soft blue glow */
+  color: white;
+  transition: all 0.4s ease;
+}
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(255, 122, 28, 0.6); /* orange glow on hover */
+}
+
+/* Card Header */
+.card-header h3 {
+  color: #ff7a1c; /* orange */
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(255,122,28,0.7);
+}
+
+.card-header p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+}
+
+/* Input fields */
+.form-control {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(0,153,255,0.3); /* blue border */
+  border-radius: 8px;
+  color: #fff;
+  padding: 10px;
+  transition: 0.3s;
+}
+.form-control:focus {
+  border-color: #ff7a1c; /* orange on focus */
+  box-shadow: 0 0 12px rgba(255,122,28,0.5);
+  background: rgba(255,255,255,0.12);
+}
+
+/* Input group icon styling */
+.input-group-text {
+  background: rgba(0, 153, 255, 0.1); /* subtle blue */
+  border: 1px solid rgba(0,153,255,0.3);
+  border-right: none;
+  color: #bbb;
+  border-radius: 8px 0 0 8px;
+  transition: all 0.3s ease;
+}
+.input-group:focus-within .input-group-text {
+  color: #ff7a1c; /* orange when active */
+  box-shadow: 0 0 12px rgba(255,122,28,0.6);
+}
+
+/* Button (Sign In) */
+.btn-primary {
+  background: linear-gradient(135deg, #ff7a1c, #ff9933);
+  border: none;
+  color: #fff !important;   /* ensure white text */
+  font-weight: bold;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 12px rgba(255,122,28,0.5);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0099ff, #0066cc); /* blue hover */
+  box-shadow: 0 0 20px rgba(0,153,255,0.7);
+  transform: translateY(-2px);
+  color: #fff !important;
+}
+
+/* Override muted text globally so it's visible on dark */
+.text-muted {
+  color: rgba(200, 220, 255, 0.8) !important;  /* light bluish-gray */
+}
+
+/* Footer */
+.card-footer {
+  margin-top: 1rem;
+  text-align: center;
+}
+.card-footer small {
+  color: #ff7a1c !important; /* orange highlight for visibility */
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 0.5rem;
+}

@@ -1,0 +1,168 @@
+<div class="body-v">
+  <div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2>Upload Bill for Extraction</h2>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Mode Toggle -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="btn-group" role="group">
+        <button type="button"
+                class="btn btn-outline-primary"
+                [class.active]="currentMode === 'file'"
+                (click)="switchMode('file')">
+          <i class="fas fa-file-upload me-2"></i>File Upload
+        </button>
+        <button type="button"
+                class="btn btn-outline-primary"
+                [class.active]="currentMode === 'qr'"
+                (click)="switchMode('qr')">
+          <i class="fas fa-qrcode me-2"></i>QR Scan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Upload / QR Scan Section -->
+    <div class="col-lg-6">
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">
+            {{ currentMode === 'file' ? 'Upload Bill' : 'Scan QR Code' }}
+          </h6>
+        </div>
+        <div class="card-body">
+
+          <!-- File Upload -->
+          <div *ngIf="currentMode === 'file'">
+            <div class="form-group">
+              <label for="billFile">Select Bill File</label>
+              <input type="file"
+                     class="form-control"
+                     id="billFile"
+                     (change)="onFileSelected($event)"
+                     accept=".jpg,.jpeg,.png,.pdf,.tiff">
+              <small class="form-text text-muted">
+                Supported formats: JPG, PNG, PDF, TIFF (Max 5MB)
+              </small>
+            </div>
+
+            <div *ngIf="selectedFile" class="mt-3">
+              <p><strong>Selected file:</strong> {{ selectedFile.name }}</p>
+              <p><strong>File size:</strong> {{ selectedFile.size / 1024 | number:'1.0-0' }} KB</p>
+            </div>
+
+            <button type="button"
+                    class="btn btn-primary mt-3"
+                    (click)="extractData()"
+                    [disabled]="!selectedFile || loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              Extract Data from Bill
+            </button>
+          </div>
+
+          <!-- QR Scanner -->
+          <div *ngIf="currentMode === 'qr'">
+            <div class="form-group">
+              <label>Scan QR Code</label>
+              <div class="camera-container" style="position: relative;">
+                <video #videoElement width="100%" height="300" style="border-radius: 8px; background:#000"></video>
+                <canvas #canvasElement style="display: none;"></canvas>
+
+                <div class="scanning-overlay" *ngIf="isScanning">
+                  <div class="scanning-frame"
+                       style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                              width: 200px; height: 200px; border: 2px solid #007bff; border-radius: 8px;"></div>
+                  <p class="mt-2 text-white text-center"
+                     style="position: absolute; bottom: 10px; left: 0; right: 0;">
+                    Position QR code within the frame
+                  </p>
+                </div>
+              </div>
+              <small class="form-text text-muted">
+                Allow camera access to scan QR codes from your bills
+              </small>
+            </div>
+
+            <div class="mt-3">
+              <button type="button"
+                      class="btn btn-primary"
+                      (click)="startQrScanner()"
+                      [disabled]="isScanning">
+                <span *ngIf="isScanning" class="spinner-border spinner-border-sm me-2"></span>
+                Start QR Scan
+              </button>
+
+              <button type="button"
+                      class="btn btn-secondary ms-2"
+                      (click)="stopQrScanner()"
+                      [disabled]="!isScanning">
+                Stop Scan
+              </button>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+            {{ errorMessage }}
+          </div>
+
+          <div *ngIf="successMessage" class="alert alert-success mt-3">
+            {{ successMessage }}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Extracted Data Section -->
+    <div class="col-lg-6">
+      <div class="card shadow" *ngIf="ocrResult">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Extracted Data</h6>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>Note:</strong> This is the extracted result (OCR or QR). Verify before using.
+          </div>
+
+          <div class="extracted-data">
+            <div class="data-item mb-3">
+              <label class="font-weight-bold">Amount:</label>
+              <span class="ml-2">{{ ocrResult.amount | currency:'USD' }}</span>
+            </div>
+            <div class="data-item mb-3">
+              <label class="font-weight-bold">Date:</label>
+              <span class="ml-2">{{ ocrResult.date | date:'mediumDate' }}</span>
+            </div>
+            <div class="data-item mb-3">
+              <label class="font-weight-bold">Vendor:</label>
+              <span class="ml-2">{{ ocrResult.vendor }}</span>
+            </div>
+          </div>
+
+          <button type="button"
+                  class="btn btn-success mt-3"
+                  (click)="useExtractedData()">
+            <i class="fas fa-check me-2"></i>
+            Use This Data for Claim
+          </button>
+
+          <div class="alert alert-warning mt-3">
+            <small>
+              <strong>Important:</strong> Please verify the extracted data matches your bill before proceeding.
+              You can manually adjust any incorrect values in the claim form.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

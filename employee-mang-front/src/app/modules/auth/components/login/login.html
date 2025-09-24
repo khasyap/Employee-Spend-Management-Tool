@@ -1,0 +1,68 @@
+<!-- Add this in index.html <head> -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<div class="login-container">
+  <!-- Left Side -->
+  <div class="login-left">
+    <div class="logo-container">
+      <img src="logo.png" alt="Company Logo" class="company-logo">
+      <h2 class="company-name">SRAKB</h2>
+    </div>
+  </div>
+
+  <!-- Right Side -->
+  <div class="login-right">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="text-center">
+          <i class="fas fa-file-invoice-dollar me-2"></i> ClaimBridgeIQ
+        </h3>
+        <p class="text-center text-muted">Sign in to your account</p>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+          
+          <!-- Email with @ icon -->
+          <div class="mb-3 input-group">
+            <span class="input-group-text"><i class="fas fa-at"></i></span>
+            <input 
+              type="email" 
+              class="form-control" 
+              id="email"
+              placeholder="Enter your email"
+              formControlName="email"
+              [class.is-invalid]="submitted && f['email'].errors">
+            <div *ngIf="submitted && f['email'].errors" class="invalid-feedback d-block">
+              <div *ngIf="f['email'].errors['required']">Email is required</div>
+              <div *ngIf="f['email'].errors['email']">Email must be a valid email address</div>
+            </div>
+          </div>
+          
+          <!-- Password with key icon -->
+          <div class="mb-3 input-group">
+            <span class="input-group-text"><i class="fas fa-key"></i></span>
+            <input 
+              type="password" 
+              class="form-control" 
+              id="password"
+              placeholder="Enter your password"
+              formControlName="password"
+              [class.is-invalid]="submitted && f['password'].errors">
+            <div *ngIf="submitted && f['password'].errors" class="invalid-feedback d-block">
+              <div *ngIf="f['password'].errors['required']">Password is required</div>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+            <i class="fas fa-sign-in-alt me-2"></i> Sign In
+          </button>
+        </form>
+      </div>
+      <div class="card-footer text-center">
+        <small class="text-muted">No self-registration. Contact administrator for access.</small>
+      </div>
+    </div>
+  </div>
+</div>

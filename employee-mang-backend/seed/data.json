@@ -1,0 +1,23 @@
+{
+  "categories": [
+    { "name": "Travel", "code": "TRV" },
+    { "name": "Food", "code": "FOD" },
+    { "name": "Transport", "code": "TRN" },
+    { "name": "Stationery", "code": "STN" },
+    { "name": "Equipment", "code": "EQP" }
+  ],
+  "settings": {
+    "perClaimLimitByRole": {
+      "employee": 1000,
+      "manager": 5000,
+      "finance": 10000
+    },
+    "monthlyLimitByCategory": [
+      { "categoryId": "", "amount": 5000 },
+      { "categoryId": "", "amount": 2000 },
+      { "categoryId": "", "amount": 1500 },
+      { "categoryId": "", "amount": 1000 },
+      { "categoryId": "", "amount": 10000 }
+    ]
+  }
+}

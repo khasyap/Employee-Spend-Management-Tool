@@ -1,0 +1,155 @@
+/* General Page Styling */
+.container-fluid {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+/* Background Gradient */
+.body-v {
+  background: linear-gradient(to right, #fdfdfd, #f2f8ff, #fff6f2); 
+  /* white → light blue → very light orange */
+  min-height: 100vh;
+}
+
+h2 {
+  color: #0056b3; /* Blue */
+  font-weight: 600;
+}
+
+.page-subtitle {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.title-divider {
+  border-top: 3px solid #ff7f32; /* Orange */
+  width: 60px;
+  margin: 0.5rem 0 1rem;
+}
+
+/* Card Styling */
+.card {
+  border-radius: 15px;
+  border: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 20px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff;
+  border-radius: 15px 15px 0 0 !important;
+  font-weight: 600;
+}
+
+/* Badges for Escalations */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.4em 0.7em;
+  border-radius: 8px;
+}
+
+.badge.bg-primary {
+  background-color: #0056b3 !important; /* Blue */
+}
+
+.badge.bg-warning {
+  background-color: #ff7f32 !important; /* Orange */
+  color: #fff;
+}
+
+/* Claim List Item */
+.card.mb-3.cursor-pointer {
+  border-left: 5px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.card.mb-3.cursor-pointer:hover {
+  border-left: 5px solid #ff7f32; /* Orange Highlight */
+  background-color: #f8faff;
+  cursor: pointer;
+}
+
+/* Selected Claim Highlight */
+.border-primary {
+  border: 2px solid #0056b3 !important;
+}
+
+/* Timeline Styling */
+.timeline {
+  border-left: 3px solid #0056b3;
+  margin-left: 1rem;
+  padding-left: 1rem;
+}
+
+.timeline-item {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -1.1rem;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  background: #ff7f32; /* Orange dot */
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #0056b3; /* Blue outline */
+}
+
+.timeline-content {
+  background: #f9f9f9;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-success {
+  background-color: #0056b3;
+  border: none;
+}
+
+.btn-success:hover {
+  background-color: #003d80;
+}
+
+.btn-warning {
+  background-color: #ff7f32;
+  border: none;
+  color: #fff;
+}
+
+.btn-warning:hover {
+  background-color: #e66d1f;
+}
+
+.btn-danger {
+  background-color: #d9534f;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #c9302c;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  border: none;
+}
+
+.btn-info:hover {
+  background-color: #11707f;
+}

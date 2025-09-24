@@ -1,0 +1,109 @@
+
+<div class="card">
+  <div class="card-header">
+    <h3>My Cab Requests</h3>
+    <div class="header-actions">
+      <a routerLink="/employee/cab-requests/new" class="btn btn-primary">
+        <i class="fas fa-plus"></i> New Request
+      </a>
+      <div class="filter-section">
+        <label for="statusFilter">Filter by Status:</label>
+        <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()" class="form-select">
+          <option value="">All</option>
+          <option value="submitted">Submitted</option>
+          <option value="under_review">Under Review</option>
+          <option value="approved_by_manager">Approved by Manager</option>
+          <option value="approved_by_admin">Approved by Admin</option>
+          <option value="approved_by_finance">Approved by Finance</option>
+          <option value="cab_assigned">Cab Assigned</option>
+          <option value="completed">Completed</option>
+          <option value="rejected_by_manager">Rejected by Manager</option>
+          <option value="rejected_by_admin">Rejected by Admin</option>
+          <option value="rejected_by_finance">Rejected by Finance</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!isLoading && !error && cabRequests.length === 0" class="empty-state">
+      <i class="fas fa-taxi"></i>
+      <h4>No Cab Requests Found</h4>
+      <p>You haven't made any cab requests yet.</p>
+      <a routerLink="/employee/cab-requests/new" class="btn btn-primary">
+        Create Your First Request
+      </a>
+    </div>
+
+    <div *ngIf="!isLoading && cabRequests.length > 0" class="requests-list">
+      <div *ngFor="let request of cabRequests" class="request-card">
+        <div class="request-actions">
+    
+  </div>
+        <div class="request-header">
+          <h5>{{ request.requestType | titlecase }} Service</h5>
+          <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+            {{ normalizeStatus(request.status) | titlecase }}
+          </span>
+        </div>
+
+        <div class="request-details">
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Pickup:</strong> {{ request.pickupLocation }}
+            </div>
+            <div class="detail-item">
+              <strong>Drop:</strong> {{ request.dropLocation }}
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Pickup Time:</strong> {{ request.pickupTime | date:'medium' }}
+            </div>
+            <div *ngIf="request.returnTime" class="detail-item">
+              <strong>Return Time:</strong> {{ request.returnTime | date:'medium' }}
+            </div>
+          </div>
+
+          <div *ngIf="request.shift" class="detail-item">
+            <strong>Shift:</strong> {{ request.shift | titlecase }}
+          </div>
+
+          <div *ngIf="request.description" class="detail-item">
+            <strong>Description:</strong> {{ request.description }}
+          </div>
+
+          <div *ngIf="request.cabDriver" class="driver-info">
+            <h6>Cab Driver Details</h6>
+            <div class="driver-details">
+              <strong>Name:</strong> {{ request.cabDriver.name }}<br>
+              <strong>Contact:</strong> {{ request.cabDriver.contactNumber }}<br>
+              <strong>Car:</strong> {{ request.cabDriver.carModel }} ({{ request.cabDriver.carNumber }})
+            </div>
+          </div>
+        </div>
+
+        <div class="request-actions">
+          <a [routerLink]="['/employee/cab/detail', request._id]" class="btn btn-sm btn-outline-primary">
+            View Details
+          </a>
+          <button *ngIf="request.status === 'cab_assigned'" 
+                  [routerLink]="['/employee/cab/cancel', request._id]"
+                  class="btn btn-sm btn-outline-warning">
+            Request Cancellation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

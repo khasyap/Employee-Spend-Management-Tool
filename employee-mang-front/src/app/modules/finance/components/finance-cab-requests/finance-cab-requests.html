@@ -1,0 +1,138 @@
+<div class="card">
+  <div class="card-header">
+    <h3>Cab Requests Management</h3>
+    <div class="filter-section">
+      <label for="statusFilter">Filter by Status:</label>
+      <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()" class="form-select">
+        <option value="">All</option>
+        <option value="approved_by_manager">Approved by Manager</option>
+        <option value="approved_by_admin">Approved by Admin</option>
+        <option value="approved_by_finance">Approved by Finance</option>
+        <option value="cab_assigned">Cab Assigned</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!isLoading && !error && cabRequests.length === 0" class="empty-state">
+      <i class="fas fa-taxi"></i>
+      <h4>No Cab Requests Found</h4>
+      <p>There are no cab requests requiring finance action.</p>
+    </div>
+
+    <div *ngIf="!isLoading && cabRequests.length > 0" class="requests-list">
+      <div *ngFor="let request of cabRequests" class="request-card">
+        <div class="request-header">
+          <h5>{{ request.requestType | titlecase }} Service - {{ getEmployeeName(request.employeeId) }}</h5>
+          <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+            {{ normalizeStatus(request.status) | titlecase }}
+          </span>
+        </div>
+
+        <div class="request-details">
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Employee:</strong> {{ getEmployeeName(request.employeeId) }}
+            </div>
+            <div class="detail-item">
+              <strong>Type:</strong> {{ request.requestType | titlecase }}
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Pickup:</strong> {{ request.pickupLocation }}
+            </div>
+            <div class="detail-item">
+              <strong>Drop:</strong> {{ request.dropLocation }}
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <strong>Pickup Time:</strong> {{ request.pickupTime | date:'medium' }}
+            </div>
+            <div *ngIf="request.shift" class="detail-item">
+              <strong>Shift:</strong> {{ request.shift | titlecase }}
+            </div>
+          </div>
+
+          <div *ngIf="request.cabDriver" class="driver-info">
+            <h6>Assigned Driver</h6>
+            <div class="driver-details">
+              <strong>Name:</strong> {{ getDriverName(request.cabDriver) }}<br>
+              <strong>Contact:</strong> {{ getDriverContact(request.cabDriver) }}<br>
+              <strong>Car:</strong> {{ getDriverCarModel(request.cabDriver) }} ({{ getDriverCarNumber(request.cabDriver) }})
+            </div>
+          </div>
+        </div>
+
+        <div class="request-actions">
+          <button *ngIf="request.status === 'approved_by_manager' && request.requestType === 'urgent'" 
+                  (click)="openAssignModal(request)" class="btn btn-sm btn-primary">
+            Assign Cab
+          </button>
+          
+          <button *ngIf="request.status === 'approved_by_admin' && request.requestType === 'daily'" 
+                  (click)="approveRequest(request)" class="btn btn-sm btn-success">
+            Approve
+          </button>
+          
+          <button *ngIf="request.status === 'approved_by_finance' && request.requestType === 'daily'" 
+                  (click)="openAssignModal(request)" class="btn btn-sm btn-primary">
+            Assign Cab
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Cab Modal -->
+<div *ngIf="showAssignModal" class="modal-backdrop show"></div>
+<div *ngIf="showAssignModal" class="modal show d-block" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Assign Cab Driver</h5>
+        <button type="button" class="btn-close" (click)="showAssignModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="driversLoading" class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i> Loading available drivers...
+        </div>
+
+        <div *ngIf="!driversLoading && availableDrivers.length === 0" class="alert alert-warning">
+          No available drivers found for the selected time.
+        </div>
+
+        <div *ngIf="!driversLoading && availableDrivers.length > 0">
+          <div class="form-group">
+            <label for="driverSelect">Select Cab Driver</label>
+            <select id="driverSelect" [(ngModel)]="selectedDriver" class="form-control">
+              <option value="">Choose a driver</option>
+              <option *ngFor="let driver of availableDrivers" [value]="driver._id">
+                {{ driver.name }} - {{ driver.carModel }} ({{ driver.carNumber }}) - {{ driver.contactNumber }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showAssignModal = false">Cancel</button>
+        <button type="button" class="btn btn-primary" 
+                [disabled]="!selectedDriver" (click)="assignCab()">
+          Assign Driver
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

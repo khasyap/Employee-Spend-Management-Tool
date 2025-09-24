@@ -1,0 +1,55 @@
+<div class="card">
+  <div class="card-header">
+    <h3>Request Cab Service Cancellation</h3>
+    <a [routerLink]="['/cab/detail', cancellationRequest.cabRequestId]" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back to Request
+    </a>
+  </div>
+
+  <div class="card-body">
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert alert-success">
+      {{ success }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #cancellationForm="ngForm">
+      <div class="form-group">
+        <label for="date">Cancellation Date *</label>
+        <input type="date" id="date" name="date" [(ngModel)]="cancellationRequest.date" 
+               class="form-control" [min]="minDate" required>
+        <small class="form-text text-muted">Select the date you want to cancel the service</small>
+      </div>
+
+      <div class="form-group">
+        <label for="requestType">Cancellation Type *</label>
+        <select id="requestType" name="requestType" [(ngModel)]="cancellationRequest.requestType" 
+                class="form-control" required>
+          <option value="">Select cancellation type</option>
+          <option value="no_pickup">No Pickup Only</option>
+          <option value="no_drop">No Drop Only</option>
+          <option value="both">Both Pickup and Drop</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="reason">Reason for Cancellation *</label>
+        <textarea id="reason" name="reason" [(ngModel)]="cancellationRequest.reason" 
+                  class="form-control" rows="4" required
+                  placeholder="Please explain why you need to cancel the cab service"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="onCancel()" class="btn btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-warning" [disabled]="isLoading || !cancellationForm.form.valid">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm"></span>
+          Submit Cancellation Request
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

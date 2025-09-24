@@ -1,0 +1,161 @@
+<div class="container-fluid mt-4" id="reports-content" #reportsContainer>
+  <div class="row">
+    <div class="col-12">
+      <h2><i class="fas fa-chart-bar me-2"></i>Finance Reports & Analytics</h2>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Date Range Selector -->
+  <div class="card shadow mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="dateRange">Date Range</label>
+            <select class="form-control" id="dateRange" [(ngModel)]="dateRange" (change)="onDateRangeChange()">
+              <option value="month">This Month</option>
+              <option value="quarter">This Quarter</option>
+              <option value="year">This Year</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4" *ngIf="dateRange === 'custom'">
+          <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" class="form-control" id="startDate" [(ngModel)]="startDate" (change)="onCustomDateChange()">
+          </div>
+        </div>
+        <div class="col-md-4" *ngIf="dateRange === 'custom'">
+          <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input type="date" class="form-control" id="endDate" [(ngModel)]="endDate" (change)="onCustomDateChange()">
+          </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <div class="btn-group">
+            <button class="btn btn-primary" (click)="exportToExcel()">
+              <i class="fas fa-file-excel me-1"></i> Excel
+            </button>
+            <button class="btn btn-danger" (click)="exportToPDF()">
+              <i class="fas fa-file-pdf me-1"></i> PDF
+            </button>
+            <button class="btn btn-info" (click)="refreshCharts()" title="Refresh Charts">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border spinner-border-sm text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-muted">Loading report data...</p>
+  </div>
+
+  <div *ngIf="!loading" class="row">
+    <!-- Claims by Status -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Claims by Status</h5>
+        </div>
+        <div class="card-body">
+          <!-- Fallback content in case charts don't render -->
+          <div *ngIf="claimsByStatusData.length === 0" class="text-center text-muted">
+            <i class="fas fa-chart-pie fa-3x mb-2"></i>
+            <p>No data available for claims by status</p>
+          </div>
+          
+          <ngx-charts-pie-chart
+            [view]="chartOptions.view"
+            [results]="claimsByStatusData"
+            [labels]="chartOptions.showLabels"
+            [doughnut]="chartOptions.isDoughnut"
+            [legend]="chartOptions.showLegend"
+            [animations]="chartOptions.animations"
+            [scheme]="chartOptions.colorScheme">
+          </ngx-charts-pie-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders by Status -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Orders by Status</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="ordersByStatusData.length === 0" class="text-center text-muted">
+            <i class="fas fa-chart-pie fa-3x mb-2"></i>
+            <p>No data available for orders by status</p>
+          </div>
+          
+          <ngx-charts-pie-chart
+            [view]="chartOptions.view"
+            [results]="ordersByStatusData"
+            [labels]="chartOptions.showLabels"
+            [doughnut]="chartOptions.isDoughnut"
+            [legend]="chartOptions.showLegend"
+            [animations]="chartOptions.animations"
+            [scheme]="chartOptions.colorScheme">
+          </ngx-charts-pie-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spending by Category -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Spending by Category</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="spendingByCategoryData.length === 0" class="text-center text-muted">
+            <i class="fas fa-chart-bar fa-3x mb-2"></i>
+            <p>No data available for spending by category</p>
+          </div>
+          
+          <ngx-charts-bar-vertical
+            [view]="chartOptions.view"
+            [results]="spendingByCategoryData"
+            [xAxis]="true"
+            [yAxis]="true"
+            [animations]="chartOptions.animations"
+            [scheme]="chartOptions.colorScheme">
+          </ngx-charts-bar-vertical>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Spending Trend -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Monthly Spending Trend</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="monthlySpendingData.length === 0" class="text-center text-muted">
+            <i class="fas fa-chart-line fa-3x mb-2"></i>
+            <p>No data available for monthly spending trend</p>
+          </div>
+          
+          <ngx-charts-line-chart
+            [view]="chartOptions.view"
+            [results]="monthlySpendingData"
+            [xAxis]="true"
+            [yAxis]="true"
+            [legend]="chartOptions.showLegend"
+            [animations]="chartOptions.animations"
+            [scheme]="chartOptions.colorScheme">
+          </ngx-charts-line-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

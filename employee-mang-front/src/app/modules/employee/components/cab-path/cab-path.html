@@ -1,0 +1,24 @@
+<!-- Quick Navigation -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card dashboard-card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between flex-wrap">
+          <a routerLink="create" class="btn btn-primary mb-2">
+            <i class="fas fa-plus me-2"></i>Cab Create
+          </a>
+         
+          <a routerLink="list" class="btn btn-success mb-2">
+            <i class="fas fa-list me-2"></i>Cab List
+          </a>
+          <a routerLink="cancel" class="btn btn-warning mb-2">
+            <i class="fas fa-shopping-cart me-2"></i>Cab Cancel
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 👇 Child routes will be injected here -->
+<router-outlet></router-outlet>

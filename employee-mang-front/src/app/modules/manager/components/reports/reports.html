@@ -1,0 +1,112 @@
+<div class="body-v">
+  <div class="container-fluid">
+  <div class="card shadow mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary">Expense Reports & Analytics</h6>
+      <div class="export-buttons">
+        <button class="btn btn-success btn-sm" (click)="exportToExcel()" [disabled]="loading">
+          <i class="fas fa-file-excel me-1"></i> Excel
+        </button>
+        <button class="btn btn-danger btn-sm ms-2" (click)="exportToPDF()" [disabled]="loading">
+          <i class="fas fa-file-pdf me-1"></i> PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Date Range -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label>Date Range</label>
+          <select class="form-select" [(ngModel)]="dateRange" (change)="onDateRangeChange()">
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+            <option value="year">This Year</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+
+        <div class="col-md-4" *ngIf="dateRange === 'custom'">
+          <label>Start Date</label>
+          <input type="date" class="form-control" [(ngModel)]="startDate" (change)="onCustomDateChange()" />
+        </div>
+
+        <div class="col-md-4" *ngIf="dateRange === 'custom'">
+          <label>End Date</label>
+          <input type="date" class="form-control" [(ngModel)]="endDate" (change)="onCustomDateChange()" />
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p>Loading reports...</p>
+      </div>
+
+      <!-- Charts -->
+      <div *ngIf="!loading" class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card shadow h-100">
+            <div class="card-header"><h6 class="m-0 font-weight-bold text-primary">Claims by Status</h6></div>
+            <div class="card-body">
+              <ngx-charts-pie-chart
+                [results]="claimsByStatus"
+                [scheme]="colorScheme"
+                [legend]="true"
+                [labels]="true"
+                [doughnut]="true">
+              </ngx-charts-pie-chart>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="card shadow h-100">
+            <div class="card-header"><h6 class="m-0 font-weight-bold text-primary">Orders by Status</h6></div>
+            <div class="card-body">
+              <ngx-charts-pie-chart
+                [results]="ordersByStatus"
+                [scheme]="colorScheme"
+                [legend]="true"
+                [labels]="true"
+                [doughnut]="true">
+              </ngx-charts-pie-chart>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="card shadow h-100">
+            <div class="card-header"><h6 class="m-0 font-weight-bold text-primary">Spending by Category</h6></div>
+            <div class="card-body">
+              <ngx-charts-bar-vertical
+                [results]="spendingByCategory"
+                [scheme]="colorScheme"
+                [xAxis]="true"
+                [yAxis]="true">
+              </ngx-charts-bar-vertical>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="card shadow h-100">
+            <div class="card-header"><h6 class="m-0 font-weight-bold text-primary">Monthly Spending Trend</h6></div>
+            <div class="card-body">
+              <ngx-charts-line-chart
+                [results]="monthlySpending"
+                [scheme]="colorScheme"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="true"
+                [timeline]="true">
+              </ngx-charts-line-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

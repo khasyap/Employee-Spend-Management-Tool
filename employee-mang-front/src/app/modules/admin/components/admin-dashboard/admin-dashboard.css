@@ -1,0 +1,289 @@
+/* Add this to your global styles or component-specific CSS */
+
+/* Pulse animation for real-time updates */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progressBar {
+  0% { width: 0%; }
+  100% { width: var(--progress-width, 50%); }
+}
+
+/* 
+.dashboard-card {
+  animation: fadeInUp 0.6s ease-out;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+
+.realtime-number {
+  font-weight: bold;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.realtime-number.updated {
+  animation: pulse 0.5s ease;
+}
+
+.progress-container {
+  background: #f0f0f0;
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  animation: progressBar 1s ease-in-out;
+  transition: width 0.5s ease;
+}
+
+.progress-bar.bg-warning {
+  background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+}
+
+.progress-bar.bg-danger {
+  background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+}
+
+
+.status-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-online {
+  background: #28a745;
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+  animation: pulse 2s infinite;
+}
+
+.status-offline {
+  background: #dc3545;
+}
+
+.connection-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.connected {
+  background: #d4edda;
+  color: #155724;
+}
+
+.disconnected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+
+.mini-chart {
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.chart-bar {
+  background: linear-gradient(to top, #4facfe, #00f2fe);
+  border-radius: 2px 2px 0 0;
+  min-width: 4px;
+  transition: height 0.5s ease;
+}
+
+
+.sparkline {
+  height: 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.sparkline-bar {
+  background: #667eea;
+  border-radius: 1px;
+  flex: 1;
+  transition: height 0.5s ease;
+}
+
+
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.badge {
+  transition: all 0.3s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+
+.table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+  transform: translateX(4px);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #dee2e6;
+} */
+
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  min-height: 100vh;
+  padding-bottom: 30px;
+}
+/* Dashboard Cards */
+.dashboard-card {
+  border-radius: 15px;
+  border: none;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: all 0.3s ease-in-out;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.dashboard-card .card-header {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff;
+  border-radius: 15px 15px 0 0;
+  font-weight: 600;
+}
+.realtime-number {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #0056b3;
+  transition: all 0.2s;
+}
+
+.realtime-number.updated {
+  color: #ff7f32;
+}
+.mini-chart, .sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 40px;
+}
+
+.chart-bar, .sparkline-bar {
+  width: 6px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ff7f32, #0056b3);
+}
+.progress-container {
+  background-color: #f1f5f9;
+  height: 6px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  height: 100%;
+  transition: width 0.4s ease;
+}
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-online {
+  background-color: #28a745;
+  box-shadow: 0 0 8px rgba(40,167,69,0.6);
+}
+
+.status-offline {
+  background-color: #dc3545;
+  box-shadow: 0 0 8px rgba(220,53,69,0.6);
+}
+
+.connection-status {
+  font-weight: 600;
+}
+
+.connected {
+  color: #28a745;
+}
+
+.disconnected {
+  color: #dc3545;
+}
+.badge {
+  padding: 0.4em 0.7em;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+.bg-warning {
+  background-color: #ff7f32 !important;
+  color: #fff;
+}
+.card-body .border {
+  border-color: #eaeaea !important;
+}
+
+.border.rounded {
+  background: #f9fafc;
+  transition: 0.3s;
+}
+
+.border.rounded:hover {
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+}

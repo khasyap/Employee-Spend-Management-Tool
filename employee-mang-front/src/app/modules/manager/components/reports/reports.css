@@ -1,0 +1,147 @@
+/* financereports.css and reports.css */
+:host {
+  display: block;
+}
+
+.card {
+  margin-bottom: 1.5rem;
+}
+
+.card-body {
+  position: relative;
+}
+
+ngx-charts-pie-chart,
+ngx-charts-bar-vertical,
+ngx-charts-line-chart {
+  display: block;
+  width: 100%;
+}
+
+/* Make charts responsive */
+::ng-deep .ngx-charts {
+  width: 100% !important;
+}
+
+::ng-deep .pie-label {
+  font-size: 10px;
+}
+
+@media (max-width: 768px) {
+  .view {
+    height: 300px !important;
+  }
+  
+  ::ng-deep .legend-title {
+    font-size: 12px;
+  }
+}
+
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  min-height: 100vh;
+  padding-bottom: 30px;
+}
+/* ==== Page Container ==== */
+.body-v {
+  background: linear-gradient(to right, #f9fbff, #fffdfb, #fdf7f2);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* ==== Card Styling ==== */
+.card {
+  border: none;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  background: linear-gradient(90deg, #0056b3, #ff7f32);
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 16px 16px 0 0;
+  padding: 10px 15px;
+}
+
+.card-header h6 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ==== Export Buttons ==== */
+.export-buttons .btn {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 5px 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-success {
+  background: linear-gradient(90deg, #28a745, #6ddc91);
+  border: none;
+}
+
+.btn-danger {
+  background: linear-gradient(90deg, #dc3545, #f58b96);
+  border: none;
+}
+
+.export-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* ==== Dropdowns & Inputs ==== */
+.form-select, .form-control {
+  border-radius: 10px;
+  border: 1px solid #ccd6e6;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.form-select:focus, .form-control:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0,86,179,0.25);
+}
+
+/* ==== Loading Spinner ==== */
+.spinner-border.text-primary {
+  color: #0056b3 !important;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-width: 0.25em;
+}
+
+/* ==== Chart Containers ==== */
+.card-body ngx-charts-pie-chart,
+.card-body ngx-charts-bar-vertical,
+.card-body ngx-charts-line-chart {
+  display: block;
+  width: 100%;
+  height: 300px;
+}
+
+/* Smooth chart hover */
+ngx-charts-pie-chart g path:hover,
+ngx-charts-bar-vertical g rect:hover,
+ngx-charts-line-chart g path.line:hover {
+  filter: brightness(1.1);
+  cursor: pointer;
+}
+
+/* ==== Labels ==== */
+label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 5px;
+}
